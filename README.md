@@ -1,2 +1,2 @@
-# Lofi-API
-API Server Lofi
+# Lofi API
+API Server for Lofi Music Website
