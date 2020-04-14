@@ -13,6 +13,6 @@ export class AuthService {
   }
 
   async validateToken(token: string): Promise<any>{
-      return await this.oktaVerifier.verifyAccessToken(token);
+      return await this.oktaVerifier.verifyAccessToken(token,"api://default");
   }
 }
