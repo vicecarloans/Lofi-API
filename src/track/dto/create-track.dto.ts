@@ -5,5 +5,7 @@ export class CreateTrackDTO {
     @IsOptional()
     description: string;
     image: string;
+    @IsOptional()
     path: string;
+    
 }

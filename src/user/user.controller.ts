@@ -3,6 +3,7 @@ import { UserService } from './user.service';
 import { BearerAuthGuard } from 'src/auth/bearer-auth.guard';
 import { User } from './user.interface';
 
+
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}

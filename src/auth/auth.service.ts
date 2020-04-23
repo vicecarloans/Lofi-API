@@ -13,6 +13,10 @@ export class AuthService {
   }
 
   async validateToken(token: string): Promise<any>{
+    try{
       return await this.oktaVerifier.verifyAccessToken(token,"api://default");
+    }catch(err){
+      console.warn(err)
+    }
   }
 }

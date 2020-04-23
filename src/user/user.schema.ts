@@ -17,5 +17,13 @@ export const UserSchema = new mongoose.Schema({
     notifications: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: "Notification"
-    }]
+    }],
+    createdAt: {
+        type: Date,
+        default: Date.now
+    },
+    updatedAt: {
+        type: Date,
+        default: Date.now
+    }
 }) 

@@ -1,13 +1,92 @@
-import { Controller, Get, Query } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Query,
+  UseGuards,
+  Param,
+  Body,
+  Post,
+  Patch,
+  Delete,
+  HttpCode,
+  UseInterceptors,
+  UploadedFile,
+} from '@nestjs/common';
 import { TrackService } from './track.service';
 import { Track } from './track.interface';
+import { BearerAuthGuard } from 'src/auth/bearer-auth.guard';
+import { CreateTrackDTO } from './dto/create-track.dto';
+import { EditTrackDTO } from './dto/edit-track.dto';
+import { IsMongoId } from 'class-validator';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { CloudinaryMediaService } from 'src/cloudinary/media.service';
 
+class TrackParams {
+  @IsMongoId()
+  id: string;
+}
 @Controller('track')
 export class TrackController {
-    constructor(private readonly trackService: TrackService){}
+  constructor(
+    private readonly trackService: TrackService
+  ) {}
 
-    @Get("")
-    async getAllPublicTracks(@Query("offset") offset = 0, @Query("limit") limit = 0) : Promise<Track[]>{
-        return this.trackService.getPublicTracks(offset, limit)
-    }
+  @Get('')
+  async getPublicTracks(
+    @Query('offset') offset = 0,
+    @Query('limit') limit = 0,
+  ): Promise<Track[]> {
+    return this.trackService.getPublicTracks(offset, limit);
+  }
+
+  @UseGuards(BearerAuthGuard)
+  @Get('private')
+  async getPrivateTracks(
+    @Query('offset') offset = 0,
+    @Query('limit') limit = 0,
+  ): Promise<Track[]> {
+    return this.trackService.getPrivateTracks(offset, limit);
+  }
+
+  @Get(':id')
+  async getPublicTrackById(@Param() params: TrackParams): Promise<Track> {
+    const { id } = params;
+    return this.trackService.getPublicTrackById(id);
+  }
+
+  @UseGuards(BearerAuthGuard)
+  @Get('private/:id')
+  async getPrivateTrackById(@Param() params: TrackParams): Promise<Track> {
+    const { id } = params;
+    return this.trackService.getPrivateTrackById(id);
+  }
+
+  @UseGuards(BearerAuthGuard)
+  @Post()
+  @UseInterceptors(FileInterceptor('file'))
+  async createTrack(
+    @UploadedFile() file,
+    @Body() createTrackDTO: CreateTrackDTO,
+  ): Promise<Track> {
+    createTrackDTO.path = file.path;
+    return this.trackService.createTrack(createTrackDTO);
+  }
+
+  @UseGuards(BearerAuthGuard)
+  @Patch(':id')
+  async editTrack(
+    @Param() params: TrackParams,
+    @Body() editTrackDTO: EditTrackDTO,
+  ): Promise<Track> {
+    const { id } = params;
+    return this.trackService.editTrack(id, editTrackDTO);
+  }
+
+  @UseGuards(BearerAuthGuard)
+  @Delete(':id')
+  @HttpCode(204)
+  async deleteTrack(@Param() params: TrackParams) {
+    const { id } = params;
+    return this.trackService.deleteTrack(id);
+  }
 }
