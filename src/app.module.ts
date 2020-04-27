@@ -17,6 +17,9 @@ import { TrackModule } from './track/track.module';
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
         uri: configService.get<string>('MONGO_URL'),
+        useUnifiedTopology: true,
+        useNewUrlParser: true,
+        useFindAndModify: false
       }),
       inject: [ConfigService],
     }),

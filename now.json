@@ -1,0 +1,16 @@
+{
+    "version": 1,
+    "name": "lofi-api",
+    "builds": [
+        {
+            "src": "dist/main.js",
+            "use": "@now/node"
+        }
+    ],
+    "routes": [
+        {
+            "src": "/(.*)",
+            "dest": "dist/main.js"
+        }
+    ]
+}

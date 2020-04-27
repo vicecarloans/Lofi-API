@@ -6,4 +6,5 @@ export interface Track extends Document {
   image: string;
   path: string;
   public: boolean;
+  owner: string;
 }

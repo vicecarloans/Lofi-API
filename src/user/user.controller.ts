@@ -19,7 +19,7 @@ export class UserController {
       user: { claims },
     } = req;
     const data = await this.userService.getUserFavouriteTracks(
-      claims.sub,
+      claims.uid,
       offset,
       limit,
     );
@@ -37,7 +37,7 @@ export class UserController {
       user: { claims },
     } = req;
     const data = await this.userService.getUserFavouriteAlbums(
-      claims.sub,
+      claims.uid,
       offset,
       limit,
     );
@@ -55,7 +55,7 @@ export class UserController {
       user: { claims },
     } = req;
     const data = await this.userService.getUserUploads(
-      claims.sub,
+      claims.uid,
       offset,
       limit,
     );
@@ -73,7 +73,7 @@ export class UserController {
       user: { claims },
     } = req;
     const data = await this.userService.getUserNotifications(
-      claims.sub,
+      claims.uid,
       offset,
       limit,
     );

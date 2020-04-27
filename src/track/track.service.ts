@@ -1,11 +1,11 @@
 import { Model } from 'mongoose';
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 
 import { Track } from './track.interface';
 import { CreateTrackDTO } from './dto/create-track.dto';
 import { EditTrackDTO } from './dto/edit-track.dto';
-import { pickBy } from 'lodash'
+import { pickBy } from 'lodash';
 import { CloudinaryMediaService } from 'src/cloudinary/media.service';
 
 @Injectable()
@@ -36,24 +36,49 @@ export class TrackService {
     return await this.trackModel.findOne({ _id: trackId, public: false });
   }
 
-  async createTrack(createTrackDTO: CreateTrackDTO): Promise<Track> {
-    const result = await this.trackModel.create(createTrackDTO);
+  async createTrack(
+    createTrackDTO: CreateTrackDTO,
+    owner: string,
+  ): Promise<Track> {
+    const result = await this.trackModel.create({ ...createTrackDTO, owner });
     this.cloudinaryMediaService.uploadAudio(createTrackDTO.path, result._id);
     return result;
   }
 
-  async editTrack(trackId: string, editTrackDTO: EditTrackDTO): Promise<Track> {
+  async editTrack(
+    trackId: string,
+    editTrackDTO: EditTrackDTO,
+    owner: string,
+  ): Promise<Track> {
     const fields = pickBy(editTrackDTO, val => val);
-    return await this.trackModel.findByIdAndUpdate(
-      trackId,
+    const res = await this.trackModel.findOneAndUpdate(
+      { _id: trackId, owner },
       { $set: fields },
       {
         new: true,
+        rawResult: true,
       },
     );
+    if (res.value) {
+      return res.value;
+    } else {
+      throw new NotFoundException(
+        'No record was found or you might not have permission to update this record',
+      );
+    }
   }
 
-  async deleteTrack(trackId: string) {
-    return await this.trackModel.findByIdAndDelete(trackId);
+  async deleteTrack(trackId: string, owner: string) {
+    const res = await this.trackModel.findOneAndDelete(
+      { _id: trackId, owner },
+      { rawResult: true },
+    );
+    if (res.value) {
+      return res.value;
+    } else {
+      throw new NotFoundException(
+        'No record was found or you might not have permission to update this record',
+      );
+    }
   }
 }

@@ -11,6 +11,7 @@ import {
   HttpCode,
   UseInterceptors,
   UploadedFile,
+  Request,
 } from '@nestjs/common';
 import { TrackService } from './track.service';
 import { Track } from './track.interface';
@@ -27,9 +28,7 @@ class TrackParams {
 }
 @Controller('track')
 export class TrackController {
-  constructor(
-    private readonly trackService: TrackService
-  ) {}
+  constructor(private readonly trackService: TrackService) {}
 
   @Get('')
   async getPublicTracks(
@@ -65,28 +64,39 @@ export class TrackController {
   @Post()
   @UseInterceptors(FileInterceptor('file'))
   async createTrack(
+    @Request() req,
     @UploadedFile() file,
     @Body() createTrackDTO: CreateTrackDTO,
   ): Promise<Track> {
+    const {
+      user: { claims },
+    } = req;
     createTrackDTO.path = file.path;
-    return this.trackService.createTrack(createTrackDTO);
+    return this.trackService.createTrack(createTrackDTO, claims.uid);
   }
 
   @UseGuards(BearerAuthGuard)
   @Patch(':id')
   async editTrack(
+    @Request() req,
     @Param() params: TrackParams,
     @Body() editTrackDTO: EditTrackDTO,
   ): Promise<Track> {
+    const {
+      user: { claims },
+    } = req;
     const { id } = params;
-    return this.trackService.editTrack(id, editTrackDTO);
+    return this.trackService.editTrack(id, editTrackDTO, claims.uid);
   }
 
   @UseGuards(BearerAuthGuard)
   @Delete(':id')
   @HttpCode(204)
-  async deleteTrack(@Param() params: TrackParams) {
+  async deleteTrack(@Request() req, @Param() params: TrackParams) {
+    const {
+      user: { claims },
+    } = req;
     const { id } = params;
-    return this.trackService.deleteTrack(id);
+    return this.trackService.deleteTrack(id, claims.uid);
   }
 }

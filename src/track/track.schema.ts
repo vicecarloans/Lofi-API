@@ -12,6 +12,7 @@ export const TrackSchema = new mongoose.Schema({
         type: Boolean,
         default: true
     },
+    owner: String,
     createdAt: {
         type: Date,
         default: Date.now
