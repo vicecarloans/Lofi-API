@@ -26,6 +26,7 @@ jobs:
         node-version: ${{ matrix.node-version }}
     - name: Deploy to ZEIT Now
       run: |
+            yarn add rimraf
             yarn run build
             yarn run deploy
       env:
