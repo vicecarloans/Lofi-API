@@ -23,7 +23,7 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
-    "deploy": "now --prod --token $ZEIT_TOKEN"
+    "deploy": "now --prod --token $ZEIT_TOKEN --confirm" 
   },
   "dependencies": {
     "@nestjs/bull": "^0.1.1",
