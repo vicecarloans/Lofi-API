@@ -1,9 +1,8 @@
 import { IsOptional } from 'class-validator'
 export class UpsertUserDTORequest {
-    oktaId: string;
     @IsOptional()
-    trackId: string;
+    tracks: string[];
     @IsOptional()
-    albumId: string;
+    albums: string[];
 }
 

@@ -6,19 +6,14 @@ export const TrackSchema = new mongoose.Schema({
         required: true
     },
     description: String,
-    image: String,
+    image: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Image"
+    },
     path: String,
     public: {
         type: Boolean,
         default: true
     },
-    owner: String,
-    createdAt: {
-        type: Date,
-        default: Date.now
-    },
-    updatedAt: {
-        type: Date,
-        default: Date.now
-    }
+    owner: String
 })

@@ -7,24 +7,21 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { TrackSchema } from 'src/track/track.schema';
 import { LoggerModule } from 'src/logger/logger.module';
 import { AppLoggerService } from 'src/logger/applogger.service';
+import { ImageSchema } from 'src/image/image.schema';
 
 @Module({
   imports: [
-    MongooseModule.forFeatureAsync([
+    MongooseModule.forFeature([
       {
         name: 'Track',
-        useFactory: () => {
-          const schema = TrackSchema;
-          schema.post('save', doc => {
-            doc.overwrite({
-              updatedAt: Date.now().toLocaleString('en-US'),
-            });
-          });
-          return schema;
-        },
+        schema: TrackSchema
+      },
+      {
+        name: 'Image',
+        schema: ImageSchema
       },
     ]),
-    LoggerModule
+    LoggerModule,
   ],
   controllers: [],
   providers: [
@@ -32,7 +29,7 @@ import { AppLoggerService } from 'src/logger/applogger.service';
     CloudinaryImageService,
     MulterStorageProvider,
     TrackService,
-    AppLoggerService
+    AppLoggerService,
   ],
   exports: [
     CloudinaryMediaService,

@@ -39,3 +39,4 @@ lerna-debug.log*
 #Assets
 assets/media/**
 assets/images/**
+.now

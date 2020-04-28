@@ -12,6 +12,7 @@ import {
   UseInterceptors,
   UploadedFile,
   Request,
+  BadRequestException,
 } from '@nestjs/common';
 import { TrackService } from './track.service';
 import { Track } from './track.interface';
@@ -20,7 +21,6 @@ import { CreateTrackDTO } from './dto/create-track.dto';
 import { EditTrackDTO } from './dto/edit-track.dto';
 import { IsMongoId } from 'class-validator';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { CloudinaryMediaService } from 'src/cloudinary/media.service';
 
 class TrackParams {
   @IsMongoId()
@@ -33,7 +33,7 @@ export class TrackController {
   @Get('')
   async getPublicTracks(
     @Query('offset') offset = 0,
-    @Query('limit') limit = 0,
+    @Query('limit') limit = 25,
   ): Promise<Track[]> {
     return this.trackService.getPublicTracks(offset, limit);
   }
@@ -42,7 +42,7 @@ export class TrackController {
   @Get('private')
   async getPrivateTracks(
     @Query('offset') offset = 0,
-    @Query('limit') limit = 0,
+    @Query('limit') limit = 25,
   ): Promise<Track[]> {
     return this.trackService.getPrivateTracks(offset, limit);
   }
@@ -62,7 +62,7 @@ export class TrackController {
 
   @UseGuards(BearerAuthGuard)
   @Post()
-  @UseInterceptors(FileInterceptor('file'))
+  @UseInterceptors(FileInterceptor('audio'))
   async createTrack(
     @Request() req,
     @UploadedFile() file,
@@ -71,6 +71,9 @@ export class TrackController {
     const {
       user: { claims },
     } = req;
+    if (!file) {
+      throw new BadRequestException(file, 'Audio is required');
+    }
     createTrackDTO.path = file.path;
     return this.trackService.createTrack(createTrackDTO, claims.uid);
   }

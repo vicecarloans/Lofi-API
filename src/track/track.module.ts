@@ -8,7 +8,7 @@ import { CloudinaryModule } from 'src/cloudinary/cloudinary.module';
 import { MulterStorageProvider } from 'src/cloudinary/multerMedia.service';
 import { StorageEnum } from 'src/cloudinary/storage.enum';
 import { CloudinaryMediaService } from 'src/cloudinary/media.service';
-
+import * as auditPlugin from 'mongoose-audit-trail';
 
 @Module({
   imports: [
@@ -17,11 +17,7 @@ import { CloudinaryMediaService } from 'src/cloudinary/media.service';
         name: 'Track',
         useFactory: () => {
           const schema = TrackSchema;
-          schema.post('save', doc => {
-            doc.overwrite({
-              updatedAt: Date.now().toLocaleString('en-US'),
-            });
-          });
+          schema.plugin(auditPlugin.plugin);
           return schema;
         },
       },

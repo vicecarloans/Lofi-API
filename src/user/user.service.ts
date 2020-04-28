@@ -52,23 +52,23 @@ export class UserService {
                      limit(limit)
   }
 
-  async unFavouriteTrack(upsertUserDTO: UpsertUserDTORequest) : Promise<User>{
-    const { oktaId, trackId, albumId } = upsertUserDTO; 
+  async unFavouriteTrack(trackId: string, owner: string) : Promise<User>{
+   
     return await this.userModel.findOneAndUpdate(
-      { oktaId: oktaId },
-      { $pull: { tracks: trackId, albums: albumId } },
-      { new: true }
+      { oktaId: owner },
+      { $pull: { tracks: trackId } },
+      { new: true },
     );
   }
 
-  async updateOrCreateFavourite(upsertUserDTO: UpsertUserDTORequest): Promise<User> {
-    const { oktaId, trackId, albumId } = upsertUserDTO;
+  async updateOrCreateFavourite(upsertUserDTO: UpsertUserDTORequest, owner: string): Promise<User> {
+    const {  tracks, albums } = upsertUserDTO;
     return await this.userModel.findOneAndUpdate(
-      { oktaId: oktaId },
+      { oktaId: owner },
       {
         $push: {
-          tracks: { $each: [trackId] || [] },
-          albums: { $each: [albumId] || [] },
+          tracks: { $each: tracks },
+          albums: { $each: albums },
         },
       },
       {
