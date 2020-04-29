@@ -27,6 +27,7 @@ export class TrackService {
     return await this.trackModel
       .find({ public: true })
       .populate('image', '-__v')
+      .populate('upload', '-__v -track -image')
       .skip(offset)
       .limit(limit);
   }
@@ -34,31 +35,33 @@ export class TrackService {
   async getPrivateTracks(offset: number, limit: number): Promise<Track[]> {
     return await this.trackModel
       .find({ public: false })
-      .populate('image', '-__v')
+      .populate("image", "-__v")
+      .populate("upload", "-__v -track -image")
       .skip(offset)
       .limit(limit);
   }
   async getPublicTrackById(trackId: string): Promise<Track> {
     return await this.trackModel
       .findOne({ _id: trackId, public: true })
-      .populate('image', '-__v');
+      .populate("upload", "-__v -track -image")
+      .populate("image", "-__v");
+      
   }
 
   async getPrivateTrackById(trackId: string): Promise<Track> {
     return await this.trackModel
       .findOne({ _id: trackId, public: false })
-      .populate('image', '-__v');
+      .populate("upload", "-__v -track -image")
+      .populate("image", "-__v");
   }
 
   async createTrack(
     createTrackDTO: CreateTrackDTO,
     owner: string,
   ): Promise<Track> {
-    console.log({ ...createTrackDTO, owner });
-    const track = await this.trackModel.create({ ...createTrackDTO, owner });
-    const uploadDTO = new CreateUploadDTO('', UploadTypeEnum.TRACK);
+    const uploadDTO = new CreateUploadDTO("", UploadTypeEnum.TRACK);
     const upload = await this.uploadModel.create({ ...uploadDTO, owner });
-    
+    const track = await this.trackModel.create({ ...createTrackDTO, owner, upload: upload._id });
     await this.audioQueue.add(
       'upload',
       {

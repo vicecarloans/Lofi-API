@@ -10,6 +10,10 @@ export const TrackSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Image',
   },
+  upload: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Upload'
+  },
   path: String,
   public: {
     type: Boolean,

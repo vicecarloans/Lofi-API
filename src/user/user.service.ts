@@ -11,7 +11,7 @@ export class UserService {
   async getUserFavouriteTracks(userId: string, offset, limit): Promise<User> {
     return await this.userModel
       .findOne({ oktaId: userId })
-      .populate('tracks', '-__v')
+      .populate('tracks', '-__v -albums -uploads -notifications')
       .skip(offset)
       .limit(limit);
   }
@@ -19,7 +19,7 @@ export class UserService {
   async getUserFavouriteAlbums(userId: string, offset, limit): Promise<User> {
     return await this.userModel
       .findOne({ oktaId: userId })
-      .populate('albums', '-__v')
+      .populate('albums', '-__v -tracks -uploads -notifications')
       .skip(offset)
       .limit(limit);
   }
@@ -27,7 +27,7 @@ export class UserService {
   async getUserUploads(userId: string, offset = 0, limit = 25): Promise<User> {
     return await this.userModel
       .findOne({ oktaId: userId })
-      .populate('uploads', '-__v')
+      .populate('uploads', '-__v -tracks -albums -notifications')
       .skip(offset)
       .limit(limit);
   }
@@ -35,7 +35,7 @@ export class UserService {
   async getUserNotifications(userId: string, offset, limit): Promise<User> {
     return await this.userModel
       .findOne({ oktaId: userId })
-      .populate('notifications', '-__v')
+      .populate('notifications', '-__v -tracks -albums -uploads')
       .skip(offset)
       .limit(limit);
   }

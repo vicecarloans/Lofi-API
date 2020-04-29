@@ -33,6 +33,7 @@
     "@nestjs/mongoose": "^6.4.0",
     "@nestjs/passport": "^7.0.0",
     "@nestjs/platform-express": "^7.0.8",
+    "@nestjs/swagger": "^4.5.3",
     "@okta/jwt-verifier": "^1.0.0",
     "async": "^3.2.0",
     "bull": "^3.13.0",
@@ -46,6 +47,7 @@
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.2",
     "rxjs": "^6.5.4",
+    "swagger-ui-express": "^4.1.4",
     "uuid": "^7.0.3"
   },
   "devDependencies": {

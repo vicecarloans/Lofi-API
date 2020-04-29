@@ -8,5 +8,5 @@ export interface User extends Document {
   albums: Album[];
   tracks: Track[];
   uploads: Upload[];
-  notifications: string[];
+  notifications: Notification[];
 }

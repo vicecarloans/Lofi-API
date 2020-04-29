@@ -25,20 +25,25 @@ export class ImageService {
   ) {}
 
   async getPublicImageById(imageId: string): Promise<Image> {
-    return await this.imageModel.findOne({ _id: imageId, public: true });
+    return await this.imageModel
+      .findOne({ _id: imageId, public: true })
+      .populate("upload", "-__v -track -image");
   }
 
   async getPrivateImageById(imageId: string): Promise<Image> {
-    return await this.imageModel.findOne({ _id: imageId, public: false });
+    return await this.imageModel
+      .findOne({ _id: imageId, public: false })
+      .populate("upload", "-__v -track -image");
   }
 
   async createImage(
     createImageDTO: CreateImageDTO,
     owner: string,
   ): Promise<Image> {
-    const image = await this.imageModel.create({ ...createImageDTO, owner });
-    const uploadDTO = new CreateUploadDTO('', UploadTypeEnum.IMAGE);
+    const uploadDTO = new CreateUploadDTO("", UploadTypeEnum.IMAGE);
     const upload = await this.uploadModel.create({ ...uploadDTO, owner });
+    const image = await this.imageModel.create({ ...createImageDTO, owner, upload: upload._id });
+    
     await this.imageQueue.add(
       'upload',
       { path: createImageDTO.path, imageId: image._id },

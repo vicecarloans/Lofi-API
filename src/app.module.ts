@@ -11,7 +11,7 @@ import { AuthService } from './auth/auth.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import { UserModule } from './user/user.module';
 import { TrackModule } from './track/track.module';
-import { BullModule } from '@nestjs/bull';
+
 
 @Module({
   imports: [

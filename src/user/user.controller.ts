@@ -6,22 +6,40 @@ import {
   Query,
   Body,
   Put,
+  HttpCode,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { BearerAuthGuard } from 'src/auth/bearer-auth.guard';
 import { User } from './user.interface';
 import { UpsertUserDTORequest } from './dto/upsert-user.dto';
+import { ApiOperation, ApiQuery, ApiBearerAuth, ApiOkResponse, ApiCreatedResponse } from '@nestjs/swagger';
+import { UserTracksResponse, UserAlbumsResponse, UserUploadsReponse, UserNotificationsResponse } from './dto/user-response.dto';
 
-@Controller('user')
+
+
+@Controller("user")
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
+  @ApiOperation({ summary: "Get My Favourite Tracks" })
+  @ApiBearerAuth()
+  @ApiQuery({
+    name: "limit",
+    required: false,
+    example: 25,
+  })
+  @ApiQuery({
+    name: "offset",
+    required: false,
+    example: "0",
+  })
+  @ApiOkResponse({ description: "Query Success", type: UserTracksResponse })
   @UseGuards(BearerAuthGuard)
-  @Get('me/favourites/tracks')
+  @Get("me/favourites/tracks")
   async getMyFavouriteTracks(
     @Request() req,
-    @Query('offset') offset = 0,
-    @Query('limit') limit = 25,
+    @Query("offset") offset = 0,
+    @Query("limit") limit = 25
   ): Promise<User> {
     const {
       user: { claims },
@@ -29,17 +47,30 @@ export class UserController {
     const data = await this.userService.getUserFavouriteTracks(
       claims.uid,
       offset,
-      limit,
+      limit
     );
     return data;
   }
 
+  @ApiOperation({ summary: "Get My Favourite Albums" })
+  @ApiBearerAuth()
+  @ApiQuery({
+    name: "limit",
+    required: false,
+    example: 25,
+  })
+  @ApiQuery({
+    name: "offset",
+    required: false,
+    example: "0",
+  })
+  @ApiOkResponse({ description: "Query Success", type: UserAlbumsResponse })
   @UseGuards(BearerAuthGuard)
-  @Get('me/favourites/albums')
+  @Get("me/favourites/albums")
   async getMyFavouriteAlbums(
     @Request() req,
-    @Query('offset') offset = 0,
-    @Query('limit') limit = 25,
+    @Query("offset") offset = 0,
+    @Query("limit") limit = 25
   ): Promise<User> {
     const {
       user: { claims },
@@ -47,17 +78,30 @@ export class UserController {
     const data = await this.userService.getUserFavouriteAlbums(
       claims.uid,
       offset,
-      limit,
+      limit
     );
     return data;
   }
 
+  @ApiOperation({ summary: "Get My Uploads" })
+  @ApiBearerAuth()
+  @ApiQuery({
+    name: "limit",
+    required: false,
+    example: 25,
+  })
+  @ApiQuery({
+    name: "offset",
+    required: false,
+    example: "0",
+  })
+  @ApiOkResponse({ description: "Query Success", type: UserUploadsReponse })
   @UseGuards(BearerAuthGuard)
-  @Get('me/uploads')
+  @Get("me/uploads")
   async getMyUploads(
     @Request() req,
-    @Query('offset') offset = 0,
-    @Query('limit') limit = 25,
+    @Query("offset") offset = 0,
+    @Query("limit") limit = 25
   ): Promise<User> {
     const {
       user: { claims },
@@ -65,17 +109,33 @@ export class UserController {
     const data = await this.userService.getUserUploads(
       claims.uid,
       offset,
-      limit,
+      limit
     );
     return data;
   }
 
+  @ApiOperation({ summary: "Get My Notifications" })
+  @ApiBearerAuth()
+  @ApiQuery({
+    name: "limit",
+    required: false,
+    example: 25,
+  })
+  @ApiQuery({
+    name: "offset",
+    required: false,
+    example: "0",
+  })
+  @ApiOkResponse({
+    description: "Query Success",
+    type: UserNotificationsResponse,
+  })
   @UseGuards(BearerAuthGuard)
-  @Get('me/notifications')
+  @Get("me/notifications")
   async getMyNotifications(
     @Request() req,
-    @Query('offset') offset = 0,
-    @Query('limit') limit = 25,
+    @Query("offset") offset = 0,
+    @Query("limit") limit = 25
   ): Promise<User> {
     const {
       user: { claims },
@@ -83,16 +143,20 @@ export class UserController {
     const data = await this.userService.getUserNotifications(
       claims.uid,
       offset,
-      limit,
+      limit
     );
     return data;
   }
 
+  @ApiOperation({ summary: "Create or Update My User Data" })
+  @ApiBearerAuth()
+  @ApiCreatedResponse()
+  @HttpCode(201)
   @UseGuards(BearerAuthGuard)
-  @Put('me')
+  @Put("me")
   async upsertUserProfile(
     @Request() req,
-    @Body() upsertUserDTO: UpsertUserDTORequest,
+    @Body() upsertUserDTO: UpsertUserDTORequest
   ): Promise<User> {
     const {
       user: { claims },
