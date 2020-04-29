@@ -15,7 +15,6 @@ import { BullModule } from '@nestjs/bull';
 
 @Module({
   imports: [
-        NotificationModule, 
     ConfigModule.forRoot({ isGlobal: true }),
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
@@ -27,37 +26,12 @@ import { BullModule } from '@nestjs/bull';
       }),
       inject: [ConfigService],
     }),
-    BullModule.registerQueueAsync(
-      {
-        name: 'audio',
-        imports: [ConfigModule],
-        useFactory: async (configService: ConfigService) => ({
-          redis: {
-            host: configService.get<string>('REDIS_HOST'),
-            port: configService.get<number>('REDIS_PORT'),
-            password: configService.get<string>('REDIS_PASSWORD'),
-          },
-        }),
-        inject: [ConfigService],
-      },
-      {
-        name: 'image',
-        imports: [ConfigModule],
-        useFactory: async (configService: ConfigService) => ({
-          redis: {
-            host: configService.get<string>('REDIS_HOST'),
-            port: configService.get<number>('REDIS_PORT'),
-            password: configService.get<string>('REDIS_PASSWORD'),
-          },
-        }),
-        inject: [ConfigService],
-      },
-    ),
     UserModule,
     AlbumModule,
     TrackModule,
     ImageModule,
     UploadModule,
+    NotificationModule,
   ],
   controllers: [AppController],
   providers: [AppLoggerService, HttpStrategy, AuthService],
