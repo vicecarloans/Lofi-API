@@ -5,9 +5,9 @@ import { AlbumModule } from './album/album.module';
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { HttpStrategy } from './auth/http.strategy'
-import { AuthService } from './auth/auth.service'
-import { MongooseModule } from '@nestjs/mongoose'
+import { HttpStrategy } from './auth/http.strategy';
+import { AuthService } from './auth/auth.service';
+import { MongooseModule } from '@nestjs/mongoose';
 import { UserModule } from './user/user.module';
 import { TrackModule } from './track/track.module';
 import { BullModule } from '@nestjs/bull';
@@ -27,19 +27,19 @@ import { BullModule } from '@nestjs/bull';
     }),
     BullModule.registerQueueAsync(
       {
-        name: 'audio-upload',
+        name: 'audio',
         imports: [ConfigModule],
         useFactory: async (configService: ConfigService) => ({
           redis: {
             host: configService.get<string>('REDIS_HOST'),
             port: configService.get<number>('REDIS_PORT'),
             password: configService.get<string>('REDIS_PASSWORD'),
-          }, 
+          },
         }),
         inject: [ConfigService],
       },
       {
-        name: 'image-upload',
+        name: 'image',
         imports: [ConfigModule],
         useFactory: async (configService: ConfigService) => ({
           redis: {

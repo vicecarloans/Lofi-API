@@ -3,7 +3,7 @@ import { AppLoggerService } from './applogger.service';
 
 @Global()
 @Module({
-    providers: [AppLoggerService],
-    exports: [AppLoggerService]
+  providers: [AppLoggerService],
+  exports: [AppLoggerService],
 })
 export class LoggerModule {}

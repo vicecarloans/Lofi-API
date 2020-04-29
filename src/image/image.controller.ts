@@ -74,7 +74,7 @@ export class ImageController {
       user: { claims },
     } = req;
     const { id } = params;
-    
+
     editImageDTO.path = file.path;
     return this.imageService.editImage(id, editImageDTO, claims.uid);
   }

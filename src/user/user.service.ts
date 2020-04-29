@@ -1,18 +1,14 @@
-import { Injectable } from "@nestjs/common";
-import { User } from "./user.interface";
-import { Model } from "mongoose";
-import { InjectModel } from "@nestjs/mongoose";
-import { UpsertUserDTORequest } from "./dto/upsert-user.dto";
+import { Injectable } from '@nestjs/common';
+import { User } from './user.interface';
+import { Model } from 'mongoose';
+import { InjectModel } from '@nestjs/mongoose';
+import { UpsertUserDTORequest } from './dto/upsert-user.dto';
 
 @Injectable()
 export class UserService {
   constructor(@InjectModel('User') private readonly userModel: Model<User>) {}
 
-  async getUserFavouriteTracks(
-    userId: string,
-    offset,
-    limit,
-  ): Promise<User> {
+  async getUserFavouriteTracks(userId: string, offset, limit): Promise<User> {
     return await this.userModel
       .findOne({ oktaId: userId })
       .populate('tracks', '-__v')
@@ -20,11 +16,7 @@ export class UserService {
       .limit(limit);
   }
 
-  async getUserFavouriteAlbums(
-    userId: string,
-    offset,
-    limit,
-  ): Promise<User> {
+  async getUserFavouriteAlbums(userId: string, offset, limit): Promise<User> {
     return await this.userModel
       .findOne({ oktaId: userId })
       .populate('albums', '-__v')
@@ -40,20 +32,15 @@ export class UserService {
       .limit(limit);
   }
 
-  async getUserNotifications(
-    userId: string,
-    offset,
-    limit,
-  ): Promise<User>{
+  async getUserNotifications(userId: string, offset, limit): Promise<User> {
     return await this.userModel
-                     .findOne({oktaId: userId})
-                     .populate("notifications", "-__v")
-                     .skip(offset).
-                     limit(limit)
+      .findOne({ oktaId: userId })
+      .populate('notifications', '-__v')
+      .skip(offset)
+      .limit(limit);
   }
 
-  async unFavouriteTrack(trackId: string, owner: string) : Promise<User>{
-   
+  async unFavouriteTrack(trackId: string, owner: string): Promise<User> {
     return await this.userModel.findOneAndUpdate(
       { oktaId: owner },
       { $pull: { tracks: trackId } },
@@ -61,8 +48,11 @@ export class UserService {
     );
   }
 
-  async updateOrCreateFavourite(upsertUserDTO: UpsertUserDTORequest, owner: string): Promise<User> {
-    const {  tracks, albums } = upsertUserDTO;
+  async updateOrCreateFavourite(
+    upsertUserDTO: UpsertUserDTORequest,
+    owner: string,
+  ): Promise<User> {
+    const { tracks, albums } = upsertUserDTO;
     return await this.userModel.findOneAndUpdate(
       { oktaId: owner },
       {

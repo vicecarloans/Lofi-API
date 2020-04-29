@@ -1,5 +1,5 @@
-import { Injectable } from "@nestjs/common";
-import * as OktaJwtVerifier from '@okta/jwt-verifier'
+import { Injectable } from '@nestjs/common';
+import * as OktaJwtVerifier from '@okta/jwt-verifier';
 
 @Injectable()
 export class AuthService {
@@ -12,11 +12,11 @@ export class AuthService {
     });
   }
 
-  async validateToken(token: string): Promise<any>{
-    try{
-      return await this.oktaVerifier.verifyAccessToken(token,"api://default");
-    }catch(err){
-      console.warn(err)
+  async validateToken(token: string): Promise<any> {
+    try {
+      return await this.oktaVerifier.verifyAccessToken(token, 'api://default');
+    } catch (err) {
+      console.warn(err);
     }
   }
 }

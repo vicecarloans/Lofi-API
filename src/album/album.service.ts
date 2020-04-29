@@ -19,8 +19,8 @@ export class AlbumService {
   async getPublicAlbums(offset: number, limit: number): Promise<Album[]> {
     return await this.albumModel
       .find({ public: true })
-      .populate('tracks', '-_id -__v')
-      .populate('image', '-_id -__v')
+      .populate('tracks', '-__v')
+      .populate('image', '-__v')
       .skip(offset)
       .limit(limit);
   }
@@ -28,23 +28,23 @@ export class AlbumService {
   async getPrivateAlbums(offset: number, limit: number): Promise<Album[]> {
     return await this.albumModel
       .find({ public: false })
-      .populate('tracks', '-_id -__v')
-      .populate('image', '-_id -__v')
+      .populate('tracks', '-__v')
+      .populate('image', '-__v')
       .skip(offset)
       .limit(limit);
   }
   async getPublicAlbumById(albumId: string): Promise<Album> {
     return await this.albumModel
       .findOne({ _id: albumId, public: true })
-      .populate('tracks', '-_id -__v')
-      .populate('image', '-_id -__v');
+      .populate('tracks', '-__v')
+      .populate('image', '-__v');
   }
 
   async getPrivateAlbumById(albumId: string): Promise<Album> {
     return await this.albumModel
       .findOne({ _id: albumId, public: false })
-      .populate('tracks', '-_id -__v')
-      .populate('image', '-_id -__v');
+      .populate('tracks', '-__v')
+      .populate('image', '-__v');
   }
 
   async createAlbum(
@@ -60,7 +60,7 @@ export class AlbumService {
     editAlbumDTO: EditAlbumDTO,
     owner: string,
   ): Promise<Album> {
-    const fields = pickBy(omit(editAlbumDTO, "tracks"), val => val);
+    const fields = pickBy(omit(editAlbumDTO, 'tracks'), val => val);
     if (isEmpty(fields)) {
       throw new BadRequestException(
         editAlbumDTO,

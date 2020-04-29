@@ -1,40 +1,42 @@
 import { Module } from '@nestjs/common';
-import { CloudinaryMediaService } from './media.service';
-import { CloudinaryImageService } from './images.service';
 import { MulterStorageProvider } from './multerMedia.service';
-import { TrackService } from 'src/track/track.service';
+
 import { MongooseModule } from '@nestjs/mongoose';
 import { TrackSchema } from 'src/track/track.schema';
 import { LoggerModule } from 'src/logger/logger.module';
 import { AppLoggerService } from 'src/logger/applogger.service';
 import { ImageSchema } from 'src/image/image.schema';
+import { BullModule } from '@nestjs/bull';
+import { CloudinaryImageQueueConsumer } from './image.consumer';
+import { CloudinaryAudioQueueConsumer } from './audio.consumer';
 
+import { UploadSchema } from 'src/upload/upload.schema';
 @Module({
   imports: [
     MongooseModule.forFeature([
       {
         name: 'Track',
-        schema: TrackSchema
+        schema: TrackSchema,
       },
       {
         name: 'Image',
-        schema: ImageSchema
+        schema: ImageSchema,
+      },
+      {
+        name: 'Upload',
+        schema: UploadSchema,
       },
     ]),
+    BullModule.registerQueue({ name: 'audio' }, { name: 'image' }),
     LoggerModule,
   ],
   controllers: [],
   providers: [
-    CloudinaryMediaService,
-    CloudinaryImageService,
     MulterStorageProvider,
-    TrackService,
     AppLoggerService,
+    CloudinaryImageQueueConsumer,
+    CloudinaryAudioQueueConsumer,
   ],
-  exports: [
-    CloudinaryMediaService,
-    CloudinaryImageService,
-    MulterStorageProvider,
-  ],
+  exports: [MulterStorageProvider],
 })
 export class CloudinaryModule {}

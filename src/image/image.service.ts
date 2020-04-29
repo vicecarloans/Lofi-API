@@ -5,18 +5,23 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Image } from './image.interface';
-import { CloudinaryImageService } from 'src/cloudinary/images.service';
 import { Model } from 'mongoose';
 import { CreateImageDTO } from './dto/create-image.dto';
 import { EditImageDTO } from './dto/edit-image.dto';
 import { pickBy, isEmpty } from 'lodash';
-
+import { InjectQueue } from '@nestjs/bull';
+import { Queue } from 'bull';
+import { CreateUploadDTO } from 'src/upload/dto/create-upload.dto';
+import { UploadTypeEnum } from 'src/upload/enum/upload-type.enum';
+import { UploadService } from 'src/upload/upload.service';
+import { Upload } from 'src/upload/upload.interface';
 
 @Injectable()
 export class ImageService {
   constructor(
     @InjectModel('Image') private readonly imageModel: Model<Image>,
-    private readonly cloudinaryImageService: CloudinaryImageService,
+    @InjectModel('Upload') private readonly uploadModel: Model<Upload>,
+    @InjectQueue('image') private readonly imageQueue: Queue,
   ) {}
 
   async getPublicImageById(imageId: string): Promise<Image> {
@@ -31,16 +36,22 @@ export class ImageService {
     createImageDTO: CreateImageDTO,
     owner: string,
   ): Promise<Image> {
-    const result = await this.imageModel.create({ ...createImageDTO, owner });
-    this.cloudinaryImageService.uploadImage(createImageDTO.path, result._id);
-    return result;
+    const image = await this.imageModel.create({ ...createImageDTO, owner });
+    const uploadDTO = new CreateUploadDTO('', UploadTypeEnum.IMAGE);
+    const upload = await this.uploadModel.create({ ...uploadDTO, owner });
+    await this.imageQueue.add(
+      'upload',
+      { path: createImageDTO.path, imageId: image._id },
+      { jobId: upload._id },
+    );
+    return image;
   }
 
   async editImage(
     imageId: string,
     editImageDTO: EditImageDTO,
     owner: string,
-  ): Promise<Image  > {
+  ): Promise<Image> {
     const fields = pickBy(editImageDTO, val => val);
     if (isEmpty(fields)) {
       throw new UnprocessableEntityException(

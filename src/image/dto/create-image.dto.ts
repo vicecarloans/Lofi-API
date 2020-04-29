@@ -1,6 +1,6 @@
-import { IsOptional } from 'class-validator'
+import { IsOptional } from 'class-validator';
 
-export class CreateImageDTO{
-    @IsOptional()
-    path: string;
+export class CreateImageDTO {
+  @IsOptional()
+  path: string;
 }

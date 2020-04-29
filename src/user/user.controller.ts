@@ -1,9 +1,16 @@
-import { Controller, Get, UseGuards, Request, Query, Body, Put } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  UseGuards,
+  Request,
+  Query,
+  Body,
+  Put,
+} from '@nestjs/common';
 import { UserService } from './user.service';
 import { BearerAuthGuard } from 'src/auth/bearer-auth.guard';
 import { User } from './user.interface';
 import { UpsertUserDTORequest } from './dto/upsert-user.dto';
-
 
 @Controller('user')
 export class UserController {
@@ -83,7 +90,10 @@ export class UserController {
 
   @UseGuards(BearerAuthGuard)
   @Put('me')
-  async upsertUserProfile(@Request() req, @Body() upsertUserDTO: UpsertUserDTORequest) : Promise<User>{
+  async upsertUserProfile(
+    @Request() req,
+    @Body() upsertUserDTO: UpsertUserDTORequest,
+  ): Promise<User> {
     const {
       user: { claims },
     } = req;

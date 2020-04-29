@@ -1,24 +1,32 @@
 import { Model } from 'mongoose';
-import { Injectable, NotFoundException, UnprocessableEntityException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  UnprocessableEntityException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-
+import { InjectQueue } from '@nestjs/bull';
+import { Queue } from 'bull';
 import { Track } from './track.interface';
 import { CreateTrackDTO } from './dto/create-track.dto';
 import { EditTrackDTO } from './dto/edit-track.dto';
 import { pickBy, isEmpty } from 'lodash';
-import { CloudinaryMediaService } from 'src/cloudinary/media.service';
+import { CreateUploadDTO } from 'src/upload/dto/create-upload.dto';
+import { UploadTypeEnum } from 'src/upload/enum/upload-type.enum';
+import { Upload } from 'src/upload/upload.interface';
 
 @Injectable()
 export class TrackService {
   constructor(
     @InjectModel('Track') private readonly trackModel: Model<Track>,
-    private cloudinaryMediaService: CloudinaryMediaService,
+    @InjectModel('Upload') private readonly uploadModel: Model<Upload>,
+    @InjectQueue('audio') private readonly audioQueue: Queue,
   ) {}
 
   async getPublicTracks(offset: number, limit: number): Promise<Track[]> {
     return await this.trackModel
       .find({ public: true })
-      .populate('image', '-_id -__v')
+      .populate('image', '-__v')
       .skip(offset)
       .limit(limit);
   }
@@ -26,29 +34,44 @@ export class TrackService {
   async getPrivateTracks(offset: number, limit: number): Promise<Track[]> {
     return await this.trackModel
       .find({ public: false })
-      .populate('image', '-_id -__v')
+      .populate('image', '-__v')
       .skip(offset)
       .limit(limit);
   }
   async getPublicTrackById(trackId: string): Promise<Track> {
     return await this.trackModel
       .findOne({ _id: trackId, public: true })
-      .populate('image', '-_id -__v');
+      .populate('image', '-__v');
   }
 
   async getPrivateTrackById(trackId: string): Promise<Track> {
     return await this.trackModel
       .findOne({ _id: trackId, public: false })
-      .populate('image', '-_id -__v');
+      .populate('image', '-__v');
   }
 
   async createTrack(
     createTrackDTO: CreateTrackDTO,
     owner: string,
   ): Promise<Track> {
-    const result = await this.trackModel.create({ ...createTrackDTO, owner });
-    this.cloudinaryMediaService.uploadAudio(createTrackDTO.path, result._id);
-    return result;
+    console.log({ ...createTrackDTO, owner });
+    const track = await this.trackModel.create({ ...createTrackDTO, owner });
+
+    const uploadDTO = new CreateUploadDTO('', UploadTypeEnum.TRACK);
+    console.log(uploadDTO);
+    const upload = await this.uploadModel.create({ ...uploadDTO, owner });
+
+    await this.audioQueue.add(
+      'upload',
+      {
+        path: createTrackDTO.path,
+        trackId: track._id,
+      },
+      {
+        jobId: upload._id,
+      },
+    );
+    return track;
   }
 
   async editTrack(
@@ -57,8 +80,11 @@ export class TrackService {
     owner: string,
   ): Promise<Track> {
     const fields = pickBy(editTrackDTO, val => val);
-    if(isEmpty(fields)){
-      throw new UnprocessableEntityException(editTrackDTO, "Update payload should include at least one updatable field")
+    if (isEmpty(fields)) {
+      throw new UnprocessableEntityException(
+        editTrackDTO,
+        'Update payload should include at least one updatable field',
+      );
     }
     const res = await this.trackModel.findOneAndUpdate(
       { _id: trackId, owner },
@@ -68,7 +94,7 @@ export class TrackService {
         rawResult: true,
       },
     );
-    
+
     if (res.value) {
       return res.value;
     } else {

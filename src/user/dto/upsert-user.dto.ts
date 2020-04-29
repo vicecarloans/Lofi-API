@@ -1,8 +1,7 @@
-import { IsOptional } from 'class-validator'
+import { IsOptional } from 'class-validator';
 export class UpsertUserDTORequest {
-    @IsOptional()
-    tracks: string[];
-    @IsOptional()
-    albums: string[];
+  @IsOptional()
+  tracks: string[];
+  @IsOptional()
+  albums: string[];
 }
-

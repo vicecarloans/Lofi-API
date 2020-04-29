@@ -20,13 +20,12 @@ import { Album } from './album.interface';
 import { CreateAlbumDTO } from './dto/create-album.dto';
 import { EditAlbumDTO } from './dto/edit-album.dto';
 
-class AlbumParams{
-    @IsMongoId()
-    id: string;
+class AlbumParams {
+  @IsMongoId()
+  id: string;
 }
 @Controller('album')
 export class AlbumController {
-
   constructor(private readonly albumService: AlbumService) {}
   @Get('')
   async getPublicAlbums(

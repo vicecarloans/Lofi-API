@@ -7,9 +7,10 @@ import { MulterModule } from '@nestjs/platform-express';
 import { CloudinaryModule } from 'src/cloudinary/cloudinary.module';
 import { MulterStorageProvider } from 'src/cloudinary/multerMedia.service';
 import { StorageEnum } from 'src/cloudinary/storage.enum';
-import { CloudinaryImageService } from 'src/cloudinary/images.service';
-import * as auditPlugin from 'mongoose-audit-trail';
 
+import { BullModule } from '@nestjs/bull';
+import { UploadSchema } from 'src/upload/upload.schema';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 @Module({
   imports: [
     MongooseModule.forFeatureAsync([
@@ -17,7 +18,13 @@ import * as auditPlugin from 'mongoose-audit-trail';
         name: 'Image',
         useFactory: () => {
           const schema = ImageSchema;
-          schema.plugin(auditPlugin.plugin)
+          return schema;
+        },
+      },
+      {
+        name: 'Upload',
+        useFactory: () => {
+          const schema = UploadSchema;
           return schema;
         },
       },
@@ -27,19 +34,30 @@ import * as auditPlugin from 'mongoose-audit-trail';
       useFactory: async (multerStorageProvider: MulterStorageProvider) => ({
         storage: multerStorageProvider.getStorage(StorageEnum.IMAGE),
         fileFilter: (req, file, cb) => {
-          const allowedMimeTypes = ["image/jpeg", "image/png", "image/gif"]
-          if(allowedMimeTypes.includes(file.mimetype)){
+          const allowedMimeTypes = ['image/jpeg', 'image/png', 'image/gif'];
+          if (allowedMimeTypes.includes(file.mimetype)) {
             cb(null, true);
-            return
+            return;
           }
           cb(null, false);
-          
-        }
+        },
       }),
       inject: [MulterStorageProvider],
     }),
+    BullModule.registerQueueAsync({
+      name: 'image',
+      imports: [ConfigModule],
+      useFactory: async (configService: ConfigService) => ({
+        redis: {
+          host: configService.get<string>('REDIS_HOST'),
+          port: configService.get<number>('REDIS_PORT'),
+          password: configService.get<string>('REDIS_PASSWORD'),
+        },
+      }),
+      inject: [ConfigService],
+    }),
   ],
   controllers: [ImageController],
-  providers: [ImageService, CloudinaryImageService],
+  providers: [ImageService],
 })
 export class ImageModule {}
