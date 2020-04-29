@@ -56,11 +56,9 @@ export class TrackService {
   ): Promise<Track> {
     console.log({ ...createTrackDTO, owner });
     const track = await this.trackModel.create({ ...createTrackDTO, owner });
-
     const uploadDTO = new CreateUploadDTO('', UploadTypeEnum.TRACK);
-    console.log(uploadDTO);
     const upload = await this.uploadModel.create({ ...uploadDTO, owner });
-
+    
     await this.audioQueue.add(
       'upload',
       {

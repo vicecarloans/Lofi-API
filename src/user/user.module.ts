@@ -11,9 +11,6 @@ import { UserService } from './user.service';
         name: 'User',
         useFactory: () => {
           const schema = UserSchema;
-          schema.post('save', doc => {
-            doc.overwrite({ updatedAt: Date.now().toLocaleString('en-US') });
-          });
           return schema;
         },
       },

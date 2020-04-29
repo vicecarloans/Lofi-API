@@ -1,3 +1,4 @@
+import { NotificationModule } from './notification/notification.module';
 import { UploadModule } from './upload/upload.module';
 import { ImageModule } from './image/image.module';
 import { AppLoggerService } from './logger/applogger.service';
@@ -14,6 +15,7 @@ import { BullModule } from '@nestjs/bull';
 
 @Module({
   imports: [
+        NotificationModule, 
     ConfigModule.forRoot({ isGlobal: true }),
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
