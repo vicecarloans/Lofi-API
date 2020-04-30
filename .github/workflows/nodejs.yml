@@ -26,9 +26,6 @@ jobs:
         node-version: ${{ matrix.node-version }}
     - name: Deploy to ZEIT Now
       run: |
-            yarn add rimraf
-            yarn run build
-            yarn run deploy
+            echo "Testing here"
       env:
         CI: true
-        ZEIT_TOKEN: ${{ secrets.ZEIT_TOKEN }}
