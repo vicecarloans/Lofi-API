@@ -11,7 +11,7 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   app.setGlobalPrefix('v1');
-  app.useGlobalPipes(new ValidationPipe());
+  app.useGlobalPipes(new ValidationPipe({skipMissingProperties: true}));
   app.useLogger(app.get(AppLoggerService));
   //Swagger
   const options = new DocumentBuilder()

@@ -12,11 +12,12 @@ import { UserService } from './user.service';
 import { BearerAuthGuard } from 'src/auth/bearer-auth.guard';
 import { User } from './user.interface';
 import { UpsertUserDTORequest } from './dto/upsert-user.dto';
-import { ApiOperation, ApiQuery, ApiBearerAuth, ApiOkResponse, ApiCreatedResponse } from '@nestjs/swagger';
+import { ApiOperation, ApiQuery, ApiBearerAuth, ApiOkResponse, ApiCreatedResponse, ApiTags } from '@nestjs/swagger';
 import { UserTracksResponse, UserAlbumsResponse, UserUploadsReponse, UserNotificationsResponse } from './dto/user-response.dto';
+import { UserQueries } from './requests/user-queries';
 
 
-
+@ApiTags("User Endpoints")
 @Controller("user")
 export class UserController {
   constructor(private readonly userService: UserService) {}
@@ -26,24 +27,26 @@ export class UserController {
   @ApiQuery({
     name: "limit",
     required: false,
+    type: Number,
     example: 25,
   })
   @ApiQuery({
     name: "offset",
     required: false,
-    example: "0",
+    type: Number,
+    example: 0,
   })
   @ApiOkResponse({ description: "Query Success", type: UserTracksResponse })
   @UseGuards(BearerAuthGuard)
   @Get("me/favourites/tracks")
   async getMyFavouriteTracks(
     @Request() req,
-    @Query("offset") offset = 0,
-    @Query("limit") limit = 25
+    @Query() queryParams: UserQueries
   ): Promise<User> {
     const {
       user: { claims },
     } = req;
+    const { offset = 0, limit = 25 } = queryParams;
     const data = await this.userService.getUserFavouriteTracks(
       claims.uid,
       offset,
@@ -57,24 +60,26 @@ export class UserController {
   @ApiQuery({
     name: "limit",
     required: false,
+    type: Number,
     example: 25,
   })
   @ApiQuery({
     name: "offset",
     required: false,
-    example: "0",
+    type: Number,
+    example: 0,
   })
   @ApiOkResponse({ description: "Query Success", type: UserAlbumsResponse })
   @UseGuards(BearerAuthGuard)
   @Get("me/favourites/albums")
   async getMyFavouriteAlbums(
     @Request() req,
-    @Query("offset") offset = 0,
-    @Query("limit") limit = 25
+    @Query() queryParams: UserQueries
   ): Promise<User> {
     const {
       user: { claims },
     } = req;
+    const { offset = 0, limit = 25 } = queryParams;
     const data = await this.userService.getUserFavouriteAlbums(
       claims.uid,
       offset,
@@ -100,12 +105,12 @@ export class UserController {
   @Get("me/uploads")
   async getMyUploads(
     @Request() req,
-    @Query("offset") offset = 0,
-    @Query("limit") limit = 25
+    @Query() queryParams: UserQueries
   ): Promise<User> {
     const {
       user: { claims },
     } = req;
+    const { offset = 0, limit = 25 } = queryParams;
     const data = await this.userService.getUserUploads(
       claims.uid,
       offset,
@@ -134,12 +139,12 @@ export class UserController {
   @Get("me/notifications")
   async getMyNotifications(
     @Request() req,
-    @Query("offset") offset = 0,
-    @Query("limit") limit = 25
+    @Query() queryParams: UserQueries
   ): Promise<User> {
     const {
       user: { claims },
     } = req;
+    const { offset = 0, limit = 25 } = queryParams;
     const data = await this.userService.getUserNotifications(
       claims.uid,
       offset,
