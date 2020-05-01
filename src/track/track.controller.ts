@@ -21,11 +21,12 @@ import { CreateTrackDTO } from './dto/create-track.dto';
 import { EditTrackDTO } from './dto/edit-track.dto';
 import { IsMongoId, IsNumber } from 'class-validator';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { ApiTags, ApiOperation, ApiBearerAuth, ApiQuery, ApiOkResponse, ApiParam, ApiBadRequestResponse, ApiCreatedResponse, ApiConsumes, ApiBody, IntersectionType, OmitType } from '@nestjs/swagger';
-import { TrackResponse } from './dto/track-response.dto';
+import { ApiTags, ApiOperation, ApiBearerAuth, ApiQuery, ApiOkResponse, ApiParam, ApiBadRequestResponse, ApiCreatedResponse, ApiConsumes, ApiBody, IntersectionType, OmitType, ApiUnprocessableEntityResponse, ApiNotFoundResponse, ApiNoContentResponse } from '@nestjs/swagger';
+import { TrackResponse } from '../swagger/responses/track-response.dto';
 import { TrackQueries } from './requests/track-queries';
 import { TrackParams } from './requests/track-params';
 import { TrackUploadDTO } from './dto/track-upload.dto';
+import { TrackUploadRequest } from 'src/swagger/requests/track-upload';
 
 
 
@@ -105,14 +106,14 @@ export class TrackController {
   @ApiOperation({ summary: "Create Track" })
   @ApiBearerAuth()
   @ApiCreatedResponse({
-    description: "Image Created",
+    description: "Track Created",
     type: TrackResponse,
   })
   @ApiBadRequestResponse({ description: "Audio is required" })
   @ApiConsumes("multipart/form-data")
   @ApiBody({
-    description: "Image Upload",
-    type: IntersectionType(OmitType(CreateTrackDTO, ["path"]), TrackUploadDTO),
+    description: "Track Upload",
+    type: TrackUploadRequest,
   })
   @UseGuards(BearerAuthGuard)
   @Post()
@@ -132,6 +133,19 @@ export class TrackController {
     return this.trackService.createTrack(createTrackDTO, claims.uid);
   }
 
+  @ApiOperation({ summary: "Create Track" })
+  @ApiBearerAuth()
+  @ApiOkResponse({
+    description: "Track Updated",
+    type: TrackResponse,
+  })
+  @ApiUnprocessableEntityResponse({
+    description: "Update payload should include at least one updatable field",
+  })
+  @ApiNotFoundResponse({
+    description:
+      "No record was found or you might not have permission to update this record",
+  })
   @UseGuards(BearerAuthGuard)
   @Patch(":id")
   async editTrack(
@@ -146,6 +160,17 @@ export class TrackController {
     return this.trackService.editTrack(id, editTrackDTO, claims.uid);
   }
 
+  @ApiOperation({ summary: "Delete Track" })
+  @ApiBearerAuth()
+  @ApiParam({ name: "id" })
+  @ApiNoContentResponse({ description: "Image Deleted" })
+  @ApiUnprocessableEntityResponse({
+    description: "Update payload should include at least one updatable field",
+  })
+  @ApiNotFoundResponse({
+    description:
+      "No record was found or you might not have permission to update this record",
+  })
   @UseGuards(BearerAuthGuard)
   @Delete(":id")
   @HttpCode(204)

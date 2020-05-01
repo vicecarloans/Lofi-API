@@ -20,7 +20,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { CreateImageDTO } from './dto/create-image.dto';
 import { EditImageDTO } from './dto/edit-image.dto';
 import { ApiOperation, ApiBearerAuth, ApiOkResponse, ApiParam, ApiBadRequestResponse, ApiCreatedResponse, ApiConsumes, ApiBody, ApiNoContentResponse, ApiNotFoundResponse, ApiUnprocessableEntityResponse, ApiTags } from '@nestjs/swagger';
-import { ImageResponse } from './dto/image-response.dto';
+import { ImageResponse } from 'src/swagger/responses/image-response.dto';
 import { ImageUploadDTO } from './dto/image-upload.dto';
 import { ImageParams } from './requests/image-params';
 
@@ -30,7 +30,7 @@ import { ImageParams } from './requests/image-params';
 export class ImageController {
   constructor(private readonly imageService: ImageService) {}
 
-  @ApiOperation({ summary: "Get Image By Id" })
+  @ApiOperation({ summary: "Get Public Image By Id" })
   @ApiParam({ name: "id" })
   @ApiOkResponse({
     description: "Image found",
@@ -94,6 +94,7 @@ export class ImageController {
     description: "Image Edited",
     type: ImageResponse,
   })
+  @ApiParam({ name: "id" })
   @ApiBadRequestResponse({ description: "Image is required" })
   @ApiUnprocessableEntityResponse({
     description: "Update payload should include at least one updatable field",
@@ -126,6 +127,7 @@ export class ImageController {
   }
 
   @ApiOperation({ summary: "Delete image" })
+  @ApiBearerAuth()
   @ApiParam({ name: "id" })
   @ApiNoContentResponse({ description: "Image Deleted" })
   @ApiNotFoundResponse({

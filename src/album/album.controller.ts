@@ -6,16 +6,13 @@ import {
   Param,
   Post,
   Request,
-  UploadedFile,
   Body,
-  BadRequestException,
   Patch,
   Delete,
   HttpCode,
 } from '@nestjs/common';
 import { AlbumService } from './album.service';
 import { BearerAuthGuard } from 'src/auth/bearer-auth.guard';
-import { IsMongoId, IsInt, Min, Max } from 'class-validator';
 import { Album } from './album.interface';
 import { CreateAlbumDTO } from './dto/create-album.dto';
 import { EditAlbumDTO } from './dto/edit-album.dto';
