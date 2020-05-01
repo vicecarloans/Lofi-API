@@ -13,9 +13,12 @@ import { BearerAuthGuard } from 'src/auth/bearer-auth.guard';
 import { User } from './user.interface';
 import { UpsertUserDTORequest } from './dto/upsert-user.dto';
 import { ApiOperation, ApiQuery, ApiBearerAuth, ApiOkResponse, ApiCreatedResponse, ApiTags } from '@nestjs/swagger';
-import { UserTracksResponse, UserAlbumsResponse, UserUploadsReponse, UserNotificationsResponse } from './dto/user-response.dto';
+import { UserTracksResponse, UserAlbumsResponse} from './dto/user-response.dto';
 import { UserQueries } from './requests/user-queries';
-
+import { Upload } from 'src/upload/upload.interface';
+import { Notification } from "src/notification/notification.interface";
+import { NotificationResponse } from 'src/swagger/responses/notification-response.dto';
+import { UploadResponse } from 'src/swagger/responses/upload-response.dto';
 
 @ApiTags("User Endpoints")
 @Controller("user")
@@ -100,13 +103,13 @@ export class UserController {
     required: false,
     example: "0",
   })
-  @ApiOkResponse({ description: "Query Success", type: UserUploadsReponse })
+  @ApiOkResponse({ description: "Query Success", type: [UploadResponse] })
   @UseGuards(BearerAuthGuard)
   @Get("me/uploads")
   async getMyUploads(
     @Request() req,
     @Query() queryParams: UserQueries
-  ): Promise<User> {
+  ): Promise<Upload[]> {
     const {
       user: { claims },
     } = req;
@@ -133,14 +136,14 @@ export class UserController {
   })
   @ApiOkResponse({
     description: "Query Success",
-    type: UserNotificationsResponse,
+    type: [NotificationResponse],
   })
   @UseGuards(BearerAuthGuard)
   @Get("me/notifications")
   async getMyNotifications(
     @Request() req,
     @Query() queryParams: UserQueries
-  ): Promise<User> {
+  ): Promise<Notification[]> {
     const {
       user: { claims },
     } = req;
@@ -166,6 +169,7 @@ export class UserController {
     const {
       user: { claims },
     } = req;
+    console.log(upsertUserDTO);
     return this.userService.updateOrCreateFavourite(upsertUserDTO, claims.uid);
   }
 }

@@ -68,11 +68,11 @@ export class AlbumService {
     }
     const res = await this.albumModel.findOneAndUpdate(
       { _id: albumId, owner },
-      { $set: fields, $push: { tracks: { $each: editAlbumDTO.tracks } } },
+      { $set: fields, $addToSet: { tracks: { $each: editAlbumDTO.tracks } } },
       {
         new: true,
         rawResult: true,
-      },
+      }
     );
 
     if (res.value) {
