@@ -42,18 +42,21 @@ export class CloudinaryImageQueueConsumer {
     const { path, imageId } = job.data;
     return this.cloudinary.v2.uploader.upload(
       path,
+      {
+        folder: "lofi-res/images"
+      },
       async (err, result: CloudinaryResponse) => {
         const payload = await this.imageModel.findByIdAndUpdate(
           imageId,
           { path: result.secure_url },
-          { new: true },
+          { new: true }
         );
         await this.uploadModel.findByIdAndUpdate(job.id.toString(), {
           status: UploadStatusEnum.COMPLETE_UPLOAD,
         });
         this.logger.log(`Finish Upload Image: ${imageId}`);
         this.logger.log(payload);
-      },
+      }
     );
   }
 
