@@ -6,52 +6,45 @@ import {
   Param,
   Post,
   Request,
-  UploadedFile,
   Body,
-  BadRequestException,
   Patch,
   Delete,
   HttpCode,
 } from '@nestjs/common';
 import { AlbumService } from './album.service';
 import { BearerAuthGuard } from 'src/auth/bearer-auth.guard';
-import { IsMongoId } from 'class-validator';
 import { Album } from './album.interface';
 import { CreateAlbumDTO } from './dto/create-album.dto';
 import { EditAlbumDTO } from './dto/edit-album.dto';
+import { AlbumParams } from './requests/album-params';
+import { AlbumQueries } from './requests/album-queries';
 
-class AlbumParams {
-  @IsMongoId()
-  id: string;
-}
-@Controller('album')
+
+
+@Controller("album")
 export class AlbumController {
   constructor(private readonly albumService: AlbumService) {}
-  @Get('')
-  async getPublicAlbums(
-    @Query('offset') offset = 0,
-    @Query('limit') limit = 25,
-  ): Promise<Album[]> {
+  @Get("")
+  async getPublicAlbums(@Query() queryParams: AlbumQueries): Promise<Album[]> {
+    const { offset = 0, limit = 25 } = queryParams;
     return this.albumService.getPublicAlbums(offset, limit);
   }
 
   @UseGuards(BearerAuthGuard)
-  @Get('private')
-  async getPrivateAlbums(
-    @Query('offset') offset = 0,
-    @Query('limit') limit = 25,
-  ): Promise<Album[]> {
+  @Get("private")
+  async getPrivateAlbums(@Query() queryParams: AlbumQueries): Promise<Album[]> {
+    const { offset = 0, limit = 25 } = queryParams;
     return this.albumService.getPrivateAlbums(offset, limit);
   }
 
-  @Get(':id')
+  @Get(":id")
   async getPublicAlbumById(@Param() params: AlbumParams): Promise<Album> {
     const { id } = params;
     return this.albumService.getPublicAlbumById(id);
   }
 
   @UseGuards(BearerAuthGuard)
-  @Get('private/:id')
+  @Get("private/:id")
   async getPrivateAlbumById(@Param() params: AlbumParams): Promise<Album> {
     const { id } = params;
     return this.albumService.getPrivateAlbumById(id);
@@ -61,8 +54,7 @@ export class AlbumController {
   @Post()
   async createAlbum(
     @Request() req,
-    @UploadedFile() file,
-    @Body() createAlbumDTO: CreateAlbumDTO,
+    @Body() createAlbumDTO: CreateAlbumDTO
   ): Promise<Album> {
     const {
       user: { claims },
@@ -71,11 +63,11 @@ export class AlbumController {
   }
 
   @UseGuards(BearerAuthGuard)
-  @Patch(':id')
+  @Patch(":id")
   async editAlbum(
     @Request() req,
     @Param() params: AlbumParams,
-    @Body() editAlbumDTO: EditAlbumDTO,
+    @Body() editAlbumDTO: EditAlbumDTO
   ): Promise<Album> {
     const {
       user: { claims },
@@ -85,7 +77,7 @@ export class AlbumController {
   }
 
   @UseGuards(BearerAuthGuard)
-  @Delete(':id')
+  @Delete(":id")
   @HttpCode(204)
   async deleteAlbum(@Request() req, @Param() params: AlbumParams) {
     const {

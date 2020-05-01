@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { ImageResponse } from 'src/image/dto/image-response.dto';
-import { TrackResponse } from 'src/track/dto/track-response.dto';
+import { ImageResponse } from './image-response.dto';
+import { TrackResponse } from './track-response.dto';
 
 export class AlbumResponse {
     @ApiProperty({name: "title", type: "string"})

@@ -1,10 +1,10 @@
 
 import { Upload } from "src/upload/upload.interface";
 import { ApiProperty } from '@nestjs/swagger'
-import { AlbumResponse } from "src/album/dto/album-response.dto";
-import { TrackResponse } from "src/track/dto/track-response.dto";
-import { UploadResponse } from "src/upload/dto/upload-response.dto";
-import { NotificationResponse } from "src/notification/dto/notification-response.dto";
+import { AlbumResponse } from "src/swagger/responses/album-response.dto";
+import { TrackResponse } from "src/swagger/responses/track-response.dto";
+import { UploadResponse } from "src/swagger/responses/upload-response.dto";
+import { NotificationResponse } from "src/swagger/responses/notification-response.dto";
 
 export class UserTracksResponse { 
     @ApiProperty({name: "oktaId", type: 'string'})

@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger'
-import { NotificationTypeEnum } from '../enum/notification-type.enum';
+import { NotificationTypeEnum } from 'src/notification/enum/notification-type.enum';
 export class NotificationResponse {
     @ApiProperty({name: "title", type: "string"})
     title: string;

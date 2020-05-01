@@ -3,11 +3,8 @@ import { UploadService } from './upload.service';
 import { IsMongoId } from 'class-validator';
 import { Upload } from './upload.interface';
 import { BearerAuthGuard } from 'src/auth/bearer-auth.guard';
+import { UploadEndpointParams } from './requests/upload-params';
 
-class UploadEndpointParams {
-  @IsMongoId()
-  id: string;
-}
 @Controller('upload')
 export class UploadController {
   constructor(private readonly uploadService: UploadService) {}
