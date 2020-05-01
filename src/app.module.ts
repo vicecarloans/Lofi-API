@@ -3,7 +3,7 @@ import { UploadModule } from './upload/upload.module';
 import { ImageModule } from './image/image.module';
 import { AppLoggerService } from './logger/applogger.service';
 import { AlbumModule } from './album/album.module';
-import { Module } from '@nestjs/common';
+import { Module, CacheModule, CacheInterceptor } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { HttpStrategy } from './auth/http.strategy';
@@ -11,6 +11,7 @@ import { AuthService } from './auth/auth.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import { UserModule } from './user/user.module';
 import { TrackModule } from './track/track.module';
+import { APP_INTERCEPTOR } from '@nestjs/core';
 
 
 @Module({
@@ -26,15 +27,15 @@ import { TrackModule } from './track/track.module';
       }),
       inject: [ConfigService],
     }),
+    CacheModule.register(),
     UploadModule,
     UserModule,
     AlbumModule,
     TrackModule,
     ImageModule,
-
     NotificationModule,
   ],
   controllers: [AppController],
-  providers: [AppLoggerService, HttpStrategy, AuthService],
+  providers: [AppLoggerService, HttpStrategy, AuthService, {provide: APP_INTERCEPTOR, useClass: CacheInterceptor}],
 })
 export class AppModule {}
