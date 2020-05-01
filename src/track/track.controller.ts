@@ -19,13 +19,11 @@ import { Track } from './track.interface';
 import { BearerAuthGuard } from 'src/auth/bearer-auth.guard';
 import { CreateTrackDTO } from './dto/create-track.dto';
 import { EditTrackDTO } from './dto/edit-track.dto';
-import { IsMongoId, IsNumber } from 'class-validator';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { ApiTags, ApiOperation, ApiBearerAuth, ApiQuery, ApiOkResponse, ApiParam, ApiBadRequestResponse, ApiCreatedResponse, ApiConsumes, ApiBody, IntersectionType, OmitType, ApiUnprocessableEntityResponse, ApiNotFoundResponse, ApiNoContentResponse } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiBearerAuth, ApiQuery, ApiOkResponse, ApiParam, ApiBadRequestResponse, ApiCreatedResponse, ApiConsumes, ApiBody, ApiUnprocessableEntityResponse, ApiNotFoundResponse, ApiNoContentResponse } from '@nestjs/swagger';
 import { TrackResponse } from '../swagger/responses/track-response.dto';
 import { TrackQueries } from './requests/track-queries';
 import { TrackParams } from './requests/track-params';
-import { TrackUploadDTO } from './dto/track-upload.dto';
 import { TrackUploadRequest } from 'src/swagger/requests/track-upload';
 
 
@@ -133,7 +131,7 @@ export class TrackController {
     return this.trackService.createTrack(createTrackDTO, claims.uid);
   }
 
-  @ApiOperation({ summary: "Create Track" })
+  @ApiOperation({ summary: "Update Track" })
   @ApiBearerAuth()
   @ApiOkResponse({
     description: "Track Updated",

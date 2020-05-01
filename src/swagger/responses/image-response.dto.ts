@@ -1,4 +1,4 @@
-import { ApiProperty, OmitType } from "@nestjs/swagger";
+import { ApiProperty } from "@nestjs/swagger";
 import { UploadStatusEnum } from "src/upload/enum/upload-status.enum";
 import { UploadTypeEnum } from "src/upload/enum/upload-type.enum";
 

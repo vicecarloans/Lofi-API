@@ -13,7 +13,6 @@ import { InjectQueue } from '@nestjs/bull';
 import { Queue } from 'bull';
 import { CreateUploadDTO } from 'src/upload/dto/create-upload.dto';
 import { UploadTypeEnum } from 'src/upload/enum/upload-type.enum';
-import { UploadService } from 'src/upload/upload.service';
 import { Upload } from 'src/upload/upload.interface';
 
 @Injectable()

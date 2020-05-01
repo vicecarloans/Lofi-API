@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/camelcase */
-import { Injectable, Scope } from '@nestjs/common';
 import * as uploadLib from 'cloudinary';
 import { ConfigService } from '@nestjs/config';
 import { CloudinaryResponse } from './cloudinary.interface';
