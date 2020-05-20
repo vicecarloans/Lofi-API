@@ -4,9 +4,12 @@ import { Model } from "mongoose";
 import { InjectModel } from "@nestjs/mongoose";
 import { UpsertUserDTORequest } from "./dto/upsert-user.dto";
 import { IUpload } from "src/upload/upload.interface";
-import { Notification } from 'src/notification/notification.interface'
+import { INotification } from 'src/notification/notification.interface'
+import { Notification } from 'src/notification/notification.serialize'
 import { Upload } from "src/upload/upload.serialize";
 import { User } from "./user.serialize";
+import { ITrack } from "src/track/track.interface";
+import { IAlbum } from "src/album/album.interface";
 
 @Injectable()
 export class UserService {
@@ -14,7 +17,9 @@ export class UserService {
     @InjectModel("User") private readonly userModel: Model<IUser>,
     @InjectModel("Upload") private readonly uploadModel: Model<IUpload>,
     @InjectModel("Notification")
-    private readonly notificationModel: Model<Notification>
+    private readonly notificationModel: Model<INotification>,
+    @InjectModel("Track") private readonly trackModel: Model<ITrack>,
+    @InjectModel("Album") private readonly albumModel: Model<IAlbum>
   ) {}
 
   async getUserFavouriteTracks(userId: string, offset, limit): Promise<User> {
@@ -69,7 +74,7 @@ export class UserService {
     owner: string
   ): Promise<User> {
     const { tracks, albums } = upsertUserDTO;
-    console.log(tracks);
+    
     return await this.userModel.findOneAndUpdate(
       { oktaId: owner },
       {

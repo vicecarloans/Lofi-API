@@ -1,3 +1,4 @@
+import { VoteModule } from './vote/vote.module';
 import { NotificationModule } from './notification/notification.module';
 import { UploadModule } from './upload/upload.module';
 import { ImageModule } from './image/image.module';
@@ -35,6 +36,7 @@ import { APP_INTERCEPTOR } from '@nestjs/core';
     TrackModule,
     ImageModule,
     NotificationModule,
+    VoteModule,
   ],
   controllers: [AppController],
   providers: [

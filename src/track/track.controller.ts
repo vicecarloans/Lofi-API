@@ -13,27 +13,43 @@ import {
   UploadedFile,
   Request,
   BadRequestException,
-  ClassSerializerInterceptor,
-} from '@nestjs/common';
-import { TrackService } from './track.service';
-import { BearerAuthGuard } from 'src/auth/bearer-auth.guard';
-import { CreateTrackDTO } from './dto/create-track.dto';
-import { EditTrackDTO } from './dto/edit-track.dto';
-import { FileInterceptor } from '@nestjs/platform-express';
-import { ApiTags, ApiOperation, ApiBearerAuth, ApiQuery, ApiOkResponse, ApiParam, ApiBadRequestResponse, ApiCreatedResponse, ApiConsumes, ApiBody, ApiUnprocessableEntityResponse, ApiNotFoundResponse, ApiNoContentResponse } from '@nestjs/swagger';
-import { TrackResponse } from '../swagger/responses/track-response.dto';
-import { TrackQueries } from './requests/track-queries';
-import { TrackParams } from './requests/track-params';
-import { TrackUploadRequest } from 'src/swagger/requests/track-upload';
-import { Track } from './track.serialize';
-
-
+  Put,
+} from "@nestjs/common";
+import { TrackService } from "./track.service";
+import { BearerAuthGuard } from "src/auth/bearer-auth.guard";
+import { CreateTrackDTO } from "./dto/create-track.dto";
+import { EditTrackDTO } from "./dto/edit-track.dto";
+import { FileInterceptor } from "@nestjs/platform-express";
+import {
+  ApiTags,
+  ApiOperation,
+  ApiBearerAuth,
+  ApiQuery,
+  ApiOkResponse,
+  ApiParam,
+  ApiBadRequestResponse,
+  ApiCreatedResponse,
+  ApiConsumes,
+  ApiBody,
+  ApiUnprocessableEntityResponse,
+  ApiNotFoundResponse,
+  ApiNoContentResponse,
+} from "@nestjs/swagger";
+import { TrackResponse } from "../swagger/responses/track-response.dto";
+import { TrackQueries } from "./requests/track-queries";
+import { TrackParams } from "./requests/track-params";
+import { TrackUploadRequest } from "src/swagger/requests/track-upload";
+import { Track } from "./track.serialize";
+import { TrackVotingDTO } from "./dto/track-vote.dto";
+import { VoteTypeEnum } from "src/vote/vote.enum";
 
 @ApiTags("Track Endpoints")
 @Controller("track")
 export class TrackController {
   constructor(private readonly trackService: TrackService) {}
 
+  /* GET */
+  // -- Public Recently Added Tracks
   @ApiOperation({ summary: "Get Public Tracks" })
   @ApiQuery({
     name: "limit",
@@ -53,9 +69,10 @@ export class TrackController {
     const { offset = 0, limit = 25 } = queryParams;
     const tracks = await this.trackService.getPublicTracks(offset, limit);
 
-    return tracks.map(track => new Track(track.toJSON()))
+    return tracks.map((track) => new Track(track.toJSON()));
   }
 
+  // -- Private Recently Added Tracks
   @ApiOperation({ summary: "Get Private Tracks" })
   @ApiBearerAuth()
   @ApiQuery({
@@ -79,6 +96,55 @@ export class TrackController {
     return tracks.map((track) => new Track(track.toJSON()));
   }
 
+  // -- Public Popular Tracks
+  @ApiOperation({ summary: "Get Public Popular Tracks based on Votes" })
+  @ApiQuery({
+    name: "limit",
+    required: false,
+    type: Number,
+    example: 25,
+  })
+  @ApiQuery({
+    name: "offset",
+    required: false,
+    type: Number,
+    example: 0,
+  })
+  @ApiOkResponse({ description: "Query Success", type: [TrackResponse] })
+  @Get("popular")
+  async getPublicPopularTracks(
+    @Query() queryParams: TrackQueries
+  ): Promise<Track[]> {
+    const { offset = 0, limit = 25 } = queryParams;
+    const tracks = await this.trackService.getPublicPopularTrack(offset, limit);
+    return tracks.map((track) => new Track(track.toJSON()));
+  }
+
+  // -- Private Popular Tracks
+  @ApiOperation({ summary: "Get Private Popular Tracks based on Votes" })
+  @ApiQuery({
+    name: "limit",
+    required: false,
+    type: Number,
+    example: 25,
+  })
+  @ApiQuery({
+    name: "offset",
+    required: false,
+    type: Number,
+    example: 0,
+  })
+  @ApiOkResponse({ description: "Query Success", type: [TrackResponse] })
+  @Get("private/popular")
+  async getPrivatePopularTracks(
+    @Query() queryParams: TrackQueries
+  ): Promise<Track[]> {
+    const { offset = 0, limit = 25 } = queryParams;
+    const tracks = await this.trackService.getPrivatePopularTrack(offset, limit);
+    return tracks.map((track) => new Track(track.toJSON()));
+  }
+
+  // -- Public Track By Id
   @ApiOperation({ summary: "Get Public Track By Id" })
   @ApiParam({ name: "id" })
   @ApiOkResponse({
@@ -92,6 +158,7 @@ export class TrackController {
     return new Track(track.toJSON());
   }
 
+  // -- Private Track By Id
   @ApiOperation({ summary: "Get Private Track By Id" })
   @ApiBearerAuth()
   @ApiParam({ name: "id" })
@@ -104,9 +171,11 @@ export class TrackController {
   async getPrivateTrackById(@Param() params: TrackParams): Promise<Track> {
     const { id } = params;
     const track = await this.trackService.getPrivateTrackById(id);
-    return new Track(track.toJSON())
+    return new Track(track.toJSON());
   }
 
+  /* POST */
+  // -- Create Track
   @ApiOperation({ summary: "Create Track" })
   @ApiBearerAuth()
   @ApiCreatedResponse({
@@ -134,10 +203,15 @@ export class TrackController {
       throw new BadRequestException(file, "Audio is required");
     }
     createTrackDTO.path = file.path;
-    const track = await this.trackService.createTrack(createTrackDTO, claims.uid);
-    return new Track(track.toJSON())
+    const track = await this.trackService.createTrack(
+      createTrackDTO,
+      claims.uid
+    );
+    return new Track(track.toJSON());
   }
 
+  // PATCH
+  // -- Update Track
   @ApiOperation({ summary: "Update Track" })
   @ApiBearerAuth()
   @ApiOkResponse({
@@ -162,10 +236,45 @@ export class TrackController {
       user: { claims },
     } = req;
     const { id } = params;
-    const track = await this.trackService.editTrack(id, editTrackDTO, claims.uid);
+    const track = await this.trackService.editTrack(
+      id,
+      editTrackDTO,
+      claims.uid
+    );
     return new Track(track.toJSON());
   }
 
+  // PUT
+  // -- Vote Track
+  @ApiOperation({
+    summary: "Vote a Track. Call the same endpoint twice will unvote",
+  })
+  @ApiBearerAuth()
+  @ApiParam({ name: "id" })
+  @ApiNoContentResponse({ description: "Vote Registered" })
+  @UseGuards(BearerAuthGuard)
+  @Put(":id")
+  @HttpCode(204)
+  async voteTrack(
+    @Request() req,
+    @Param() params: TrackParams,
+    @Body() trackVotingDTO: TrackVotingDTO
+  ) {
+    const {
+      user: { claims },
+    } = req;
+    const { id } = params;
+    const { type } = trackVotingDTO;
+    if (type === VoteTypeEnum.UPVOTE) {
+      return this.trackService.upvoteTrack(id, claims.uid);
+    }
+    if (type === VoteTypeEnum.DOWNVOTE) {
+      return this.trackService.downvoteTrack(id, claims.uid);
+    }
+  }
+
+  // DELETE
+  // -- Delete Track
   @ApiOperation({ summary: "Delete Track" })
   @ApiBearerAuth()
   @ApiParam({ name: "id" })

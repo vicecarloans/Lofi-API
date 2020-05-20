@@ -12,24 +12,22 @@ import { UploadService } from 'src/upload/upload.service';
 import { BullModule } from '@nestjs/bull';
 import { UploadSchema } from 'src/upload/upload.schema';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { VoteSchema } from 'src/vote/vote.schema';
 @Module({
   imports: [
-    MongooseModule.forFeatureAsync([
+    MongooseModule.forFeature([
       {
         name: 'Track',
-        useFactory: () => {
-          const schema = TrackSchema;
-
-          return schema;
-        },
+        schema: TrackSchema
       },
       {
         name: 'Upload',
-        useFactory: () => {
-          const schema = UploadSchema;
-          return schema;
-        },
+        schema: UploadSchema
       },
+      {
+        name: 'Vote',
+        schema: VoteSchema
+      }
     ]),
     MulterModule.registerAsync({
       imports: [CloudinaryModule],

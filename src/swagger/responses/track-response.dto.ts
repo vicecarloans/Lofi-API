@@ -43,11 +43,5 @@ export class TrackResponse {
   upvotes: number;
   @ApiProperty({name: "downvotes", type: "number"})
   downvotes: number;
-  @ApiProperty({name: "popularity", type: "number"})
-  popularity: number;
-  @ApiProperty({name: "createdAt", type: "date"})
-  createdAt: Date;
-  @ApiProperty({name: "updatedAt", type: "date"})
-  updatedAt: Date;
 }
 

@@ -16,7 +16,7 @@ import { ApiOperation, ApiQuery, ApiBearerAuth, ApiOkResponse, ApiCreatedRespons
 import { UserTracksResponse, UserAlbumsResponse} from './dto/user-response.dto';
 import { UserQueries } from './requests/user-queries';
 import { Upload } from 'src/upload/upload.serialize';
-import { Notification } from "src/notification/notification.interface";
+import { Notification } from "src/notification/notification.serialize";
 import { NotificationResponse } from 'src/swagger/responses/notification-response.dto';
 import { UploadResponse } from 'src/swagger/responses/upload-response.dto';
 

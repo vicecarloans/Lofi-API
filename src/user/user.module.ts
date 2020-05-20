@@ -5,31 +5,32 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { UserService } from './user.service';
 import { UploadSchema } from 'src/upload/upload.schema';
 import { NotificationSchema } from 'src/notification/notification.schema';
+import { TrackSchema } from 'src/track/track.schema';
+import { AlbumSchema } from 'src/album/album.schema';
 
 @Module({
   imports: [
-    MongooseModule.forFeatureAsync([
+    MongooseModule.forFeature([
       {
         name: "User",
-        useFactory: () => {
-          const schema = UserSchema;
-          return schema;
-        },
+        schema: UserSchema
       },
       {
         name: "Upload",
-        useFactory: () => {
-          const schema = UploadSchema;
-          return schema;
-        },
+        schema: UploadSchema
       },
       {
         name: "Notification",
-        useFactory: () => {
-          const schema = NotificationSchema;
-          return schema;
-        }
+        schema: NotificationSchema
       },
+      {
+        name: "Track",
+        schema: TrackSchema
+      },
+      {
+        name: "Album",
+        schema: AlbumSchema
+      }
     ]),
   ],
   controllers: [UserController],
