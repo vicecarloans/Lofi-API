@@ -49,7 +49,7 @@ export class CloudinaryAudioQueueConsumer {
       async (err, result: CloudinaryResponse) => {
         const payload = await this.trackModel.findByIdAndUpdate(
           trackId,
-          { path: result.secure_url },
+          { path: result.secure_url, updatedAt: Date.now() },
           { new: true },
         );
         await this.uploadModel.findByIdAndUpdate(job.id.toString(), {

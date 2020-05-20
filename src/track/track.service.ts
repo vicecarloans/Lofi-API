@@ -130,9 +130,10 @@ export class TrackService {
         "Update payload should include at least one updatable field"
       );
     }
+    
     const res = await this.trackModel.findOneAndUpdate(
       { _id: trackId, owner },
-      { $set: fields },
+      { $set: fields, updatedAt: Date.now() },
       {
         new: true,
         rawResult: true,
@@ -181,6 +182,7 @@ export class TrackService {
         await track.updateOne({
           $inc: { upvotes: 1, downvotes: -1 },
           $set: { popularity: score },
+          updatedAt: Date.now(),
         });
       } else {
         // If vote action was insert
@@ -189,6 +191,7 @@ export class TrackService {
         await track.updateOne({
           $inc: { upvotes: 1 },
           $set: { popularity: score },
+          updatedAt: Date.now()
         });
       }
     } else {
@@ -200,6 +203,7 @@ export class TrackService {
       await track.updateOne({
         $inc: { upvotes: -1 },
         $set: { popularity: score },
+        updatedAt: Date.now(),
       });
     }
   }
@@ -236,6 +240,7 @@ export class TrackService {
         await track.updateOne({
           $inc: { upvotes: -1, downvotes: 1 },
           $set: { popularity: score },
+          updatedAt: Date.now(),
         });
       } else {
         // If vote action was insert
@@ -244,6 +249,7 @@ export class TrackService {
         await track.updateOne({
           $inc: { downvotes: 1 },
           $set: { popularity: score },
+          updatedAt: Date.now(),
         });
       }
     } else {
@@ -255,6 +261,7 @@ export class TrackService {
       await track.updateOne({
         $inc: { downvotes: -1 },
         $set: { popularity: score },
+        updatedAt: Date.now(),
       });
     }
   }
