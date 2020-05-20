@@ -1,22 +1,25 @@
 import { Injectable } from "@nestjs/common";
-import { User } from "./user.interface";
+import { IUser } from "./user.interface";
 import { Model } from "mongoose";
 import { InjectModel } from "@nestjs/mongoose";
 import { UpsertUserDTORequest } from "./dto/upsert-user.dto";
-import { Upload } from "src/upload/upload.interface";
+import { IUpload } from "src/upload/upload.interface";
 import { Notification } from 'src/notification/notification.interface'
+import { Upload } from "src/upload/upload.serialize";
+import { User } from "./user.serialize";
 
 @Injectable()
 export class UserService {
   constructor(
-    @InjectModel("User") private readonly userModel: Model<User>,
-    @InjectModel("Upload") private readonly uploadModel: Model<Upload>,
-    @InjectModel("Notification") private readonly notificationModel: Model<Notification>
+    @InjectModel("User") private readonly userModel: Model<IUser>,
+    @InjectModel("Upload") private readonly uploadModel: Model<IUpload>,
+    @InjectModel("Notification")
+    private readonly notificationModel: Model<Notification>
   ) {}
 
   async getUserFavouriteTracks(userId: string, offset, limit): Promise<User> {
     return await this.userModel
-      .findOne({ oktaId: userId }, {$unset: "albums"})
+      .findOne({ oktaId: userId }, { $unset: "albums" })
       .populate("tracks", "-__v")
       .skip(offset)
       .limit(limit);
@@ -30,14 +33,23 @@ export class UserService {
       .limit(limit);
   }
 
-  async getUserUploads(userId: string, offset = 0, limit = 25): Promise<Upload[]> {
-    return await this.uploadModel
+  async getUserUploads(
+    userId: string,
+    offset = 0,
+    limit = 25
+  ): Promise<Upload[]> {
+    const uploads = await this.uploadModel
       .find({ owner: userId })
       .skip(offset)
       .limit(limit);
+    return uploads.map(upload => new Upload(upload.toJSON()))
   }
 
-  async getUserNotifications(userId: string, offset, limit): Promise<Notification[]> {
+  async getUserNotifications(
+    userId: string,
+    offset,
+    limit
+  ): Promise<Notification[]> {
     return await this.notificationModel
       .find({ owner: userId })
       .skip(offset)

@@ -1,6 +1,6 @@
 import { Controller, Get, Param, UseGuards, Request } from '@nestjs/common';
 import { UploadService } from './upload.service';
-import { Upload } from './upload.interface';
+import { Upload } from './upload.serialize';
 import { BearerAuthGuard } from 'src/auth/bearer-auth.guard';
 import { UploadEndpointParams } from './requests/upload-params';
 import { ApiTags, ApiBearerAuth, ApiOperation, ApiOkResponse, ApiParam } from '@nestjs/swagger';

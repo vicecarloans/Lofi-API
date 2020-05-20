@@ -1,9 +1,9 @@
 import { Document } from 'mongoose';
-import { Upload } from 'src/upload/upload.interface';
+import { IUpload } from "src/upload/upload.interface";
 
-export interface Image extends Document {
+export interface IImage extends Document {
   path: string;
   owner: string;
   public: boolean;
-  upload: Upload;
+  upload: IUpload;
 }

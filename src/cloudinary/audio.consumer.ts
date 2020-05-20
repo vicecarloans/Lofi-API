@@ -5,7 +5,7 @@ import { ConfigService } from '@nestjs/config';
 import { CloudinaryResponse } from './cloudinary.interface';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { Track } from 'src/track/track.interface';
+import { ITrack } from 'src/track/track.interface';
 import { AppLoggerService } from 'src/logger/applogger.service';
 import {
   Processor,
@@ -17,7 +17,7 @@ import { Job } from 'bull';
 import { QueueTrackDTO } from 'src/track/dto/queue-track.dto';
 import { UploadStatusEnum } from 'src/upload/enum/upload-status.enum';
 
-import { Upload } from 'src/upload/upload.interface';
+import { IUpload } from 'src/upload/upload.interface';
 
 @Processor('audio')
 export class CloudinaryAudioQueueConsumer {
@@ -25,8 +25,8 @@ export class CloudinaryAudioQueueConsumer {
   storage: any;
   constructor(
     private readonly configService: ConfigService,
-    @InjectModel('Track') private readonly trackModel: Model<Track>,
-    @InjectModel('Upload') private readonly uploadModel: Model<Upload>,
+    @InjectModel('Track') private readonly trackModel: Model<ITrack>,
+    @InjectModel('Upload') private readonly uploadModel: Model<IUpload>,
     private logger: AppLoggerService,
   ) {
     this.cloudinary = uploadLib;

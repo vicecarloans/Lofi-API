@@ -14,6 +14,7 @@ import { TrackModule } from './track/track.module';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 
 
+
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
@@ -36,6 +37,11 @@ import { APP_INTERCEPTOR } from '@nestjs/core';
     NotificationModule,
   ],
   controllers: [AppController],
-  providers: [AppLoggerService, HttpStrategy, AuthService, {provide: APP_INTERCEPTOR, useClass: CacheInterceptor}],
+  providers: [
+    AppLoggerService,
+    HttpStrategy,
+    AuthService,
+    { provide: APP_INTERCEPTOR, useClass: CacheInterceptor },
+  ],
 })
 export class AppModule {}

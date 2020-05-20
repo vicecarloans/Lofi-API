@@ -13,7 +13,7 @@ import {
 } from '@nestjs/common';
 import { AlbumService } from './album.service';
 import { BearerAuthGuard } from 'src/auth/bearer-auth.guard';
-import { Album } from './album.interface';
+import { Album } from './album.serialize';
 import { CreateAlbumDTO } from './dto/create-album.dto';
 import { EditAlbumDTO } from './dto/edit-album.dto';
 import { AlbumParams } from './requests/album-params';

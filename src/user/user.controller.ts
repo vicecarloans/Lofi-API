@@ -10,12 +10,12 @@ import {
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { BearerAuthGuard } from 'src/auth/bearer-auth.guard';
-import { User } from './user.interface';
+import { User } from './user.serialize';
 import { UpsertUserDTORequest } from './dto/upsert-user.dto';
 import { ApiOperation, ApiQuery, ApiBearerAuth, ApiOkResponse, ApiCreatedResponse, ApiTags } from '@nestjs/swagger';
 import { UserTracksResponse, UserAlbumsResponse} from './dto/user-response.dto';
 import { UserQueries } from './requests/user-queries';
-import { Upload } from 'src/upload/upload.interface';
+import { Upload } from 'src/upload/upload.serialize';
 import { Notification } from "src/notification/notification.interface";
 import { NotificationResponse } from 'src/swagger/responses/notification-response.dto';
 import { UploadResponse } from 'src/swagger/responses/upload-response.dto';

@@ -4,15 +4,16 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Album } from './album.interface';
+import { IAlbum } from './album.interface';
 import { Model } from 'mongoose';
 import { CreateAlbumDTO } from './dto/create-album.dto';
 import { EditAlbumDTO } from './dto/edit-album.dto';
 import { pickBy, isEmpty, omit } from 'lodash';
+import { Album } from './album.serialize';
 @Injectable()
 export class AlbumService {
   constructor(
-    @InjectModel('Album') private readonly albumModel: Model<Album>,
+    @InjectModel('Album') private readonly albumModel: Model<IAlbum>,
   ) {}
 
   async getPublicAlbums(offset: number, limit: number): Promise<Album[]> {

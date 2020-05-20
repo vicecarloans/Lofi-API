@@ -13,9 +13,9 @@ import {
   UploadedFile,
   Request,
   BadRequestException,
+  ClassSerializerInterceptor,
 } from '@nestjs/common';
 import { TrackService } from './track.service';
-import { Track } from './track.interface';
 import { BearerAuthGuard } from 'src/auth/bearer-auth.guard';
 import { CreateTrackDTO } from './dto/create-track.dto';
 import { EditTrackDTO } from './dto/edit-track.dto';
@@ -25,6 +25,7 @@ import { TrackResponse } from '../swagger/responses/track-response.dto';
 import { TrackQueries } from './requests/track-queries';
 import { TrackParams } from './requests/track-params';
 import { TrackUploadRequest } from 'src/swagger/requests/track-upload';
+import { Track } from './track.serialize';
 
 
 
@@ -50,7 +51,9 @@ export class TrackController {
   @Get("")
   async getPublicTracks(@Query() queryParams: TrackQueries): Promise<Track[]> {
     const { offset = 0, limit = 25 } = queryParams;
-    return this.trackService.getPublicTracks(offset, limit);
+    const tracks = await this.trackService.getPublicTracks(offset, limit);
+
+    return tracks.map(track => new Track(track.toJSON()))
   }
 
   @ApiOperation({ summary: "Get Private Tracks" })
@@ -72,7 +75,8 @@ export class TrackController {
   @Get("private")
   async getPrivateTracks(@Query() queryParams: TrackQueries): Promise<Track[]> {
     const { offset = 0, limit = 25 } = queryParams;
-    return this.trackService.getPrivateTracks(offset, limit);
+    const tracks = await this.trackService.getPrivateTracks(offset, limit);
+    return tracks.map((track) => new Track(track.toJSON()));
   }
 
   @ApiOperation({ summary: "Get Public Track By Id" })
@@ -84,7 +88,8 @@ export class TrackController {
   @Get(":id")
   async getPublicTrackById(@Param() params: TrackParams): Promise<Track> {
     const { id } = params;
-    return this.trackService.getPublicTrackById(id);
+    const track = await this.trackService.getPublicTrackById(id);
+    return new Track(track.toJSON());
   }
 
   @ApiOperation({ summary: "Get Private Track By Id" })
@@ -98,7 +103,8 @@ export class TrackController {
   @Get("private/:id")
   async getPrivateTrackById(@Param() params: TrackParams): Promise<Track> {
     const { id } = params;
-    return this.trackService.getPrivateTrackById(id);
+    const track = await this.trackService.getPrivateTrackById(id);
+    return new Track(track.toJSON())
   }
 
   @ApiOperation({ summary: "Create Track" })
@@ -128,7 +134,8 @@ export class TrackController {
       throw new BadRequestException(file, "Audio is required");
     }
     createTrackDTO.path = file.path;
-    return this.trackService.createTrack(createTrackDTO, claims.uid);
+    const track = await this.trackService.createTrack(createTrackDTO, claims.uid);
+    return new Track(track.toJSON())
   }
 
   @ApiOperation({ summary: "Update Track" })
@@ -155,7 +162,8 @@ export class TrackController {
       user: { claims },
     } = req;
     const { id } = params;
-    return this.trackService.editTrack(id, editTrackDTO, claims.uid);
+    const track = await this.trackService.editTrack(id, editTrackDTO, claims.uid);
+    return new Track(track.toJSON());
   }
 
   @ApiOperation({ summary: "Delete Track" })

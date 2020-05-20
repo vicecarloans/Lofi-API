@@ -14,7 +14,8 @@ import {
   HttpCode,
 } from '@nestjs/common';
 import { ImageService } from './image.service';
-import { Image } from './image.interface';
+import { IImage } from './image.interface';
+import { Image } from './image.serialize'
 import { BearerAuthGuard } from 'src/auth/bearer-auth.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { CreateImageDTO } from './dto/create-image.dto';

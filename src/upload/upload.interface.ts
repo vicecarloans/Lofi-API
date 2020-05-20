@@ -1,12 +1,12 @@
 import { Document } from 'mongoose';
-import { Track } from 'src/track/track.interface';
-import { Image } from 'src/image/image.interface';
+import { ITrack } from 'src/track/track.interface';
+import { IImage } from 'src/image/image.interface';
 
-export interface Upload extends Document {
+export interface IUpload extends Document {
   status: string;
   details: string;
   type: string;
-  track: Track;
-  image: Image;
+  track: ITrack;
+  image: IImage;
   owner: string;
 }

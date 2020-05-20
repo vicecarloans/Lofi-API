@@ -1,9 +1,9 @@
 import { Document } from 'mongoose';
-import { Album } from 'src/album/album.interface';
-import { Track } from 'src/track/track.interface';
+import { IAlbum } from 'src/album/album.interface';
+import { ITrack } from 'src/track/track.interface';
 
-export interface User extends Document {
+export interface IUser extends Document {
   readonly oktaId: string;
-  albums: Album[];
-  tracks: Track[];
+  albums: IAlbum[];
+  tracks: ITrack[];
 }
