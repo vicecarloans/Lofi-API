@@ -3,7 +3,7 @@ import * as uploadLib from 'cloudinary';
 import { ConfigService } from '@nestjs/config';
 import { CloudinaryResponse } from './cloudinary.interface';
 import { InjectModel } from '@nestjs/mongoose';
-import { Image } from 'src/image/image.interface';
+import { IImage } from 'src/image/image.interface';
 import { Model } from 'mongoose';
 import { AppLoggerService } from 'src/logger/applogger.service';
 import {
@@ -11,39 +11,40 @@ import {
   Process,
   OnQueueActive,
   OnQueueCompleted,
+  OnQueueFailed,
 } from '@nestjs/bull';
 import { Job } from 'bull';
 import { QueueImageDTO } from 'src/image/dto/queue-image.dto';
 
 import { UploadStatusEnum } from 'src/upload/enum/upload-status.enum';
 
-import { Upload } from 'src/upload/upload.interface';
+import { IUpload } from 'src/upload/upload.interface';
 
-@Processor('image')
+@Processor("image")
 export class CloudinaryImageQueueConsumer {
   cloudinary: any;
   storage: any;
   constructor(
     private readonly configService: ConfigService,
-    @InjectModel('Image') private readonly imageModel: Model<Image>,
-    @InjectModel('Upload') private readonly uploadModel: Model<Upload>,
-    private logger: AppLoggerService,
+    @InjectModel("Image") private readonly imageModel: Model<IImage>,
+    @InjectModel("Upload") private readonly uploadModel: Model<IUpload>,
+    private logger: AppLoggerService
   ) {
     this.cloudinary = uploadLib;
     this.cloudinary.v2.config({
-      cloud_name: this.configService.get<string>('CLOUDINARY_NAME'),
-      api_key: this.configService.get<string>('CLOUDINARY_API_KEY'),
-      api_secret: this.configService.get<string>('CLOUDINARY_SECRET'),
+      cloud_name: this.configService.get<string>("CLOUDINARY_NAME"),
+      api_key: this.configService.get<string>("CLOUDINARY_API_KEY"),
+      api_secret: this.configService.get<string>("CLOUDINARY_SECRET"),
     });
   }
 
-  @Process('upload')
+  @Process("upload")
   uploadImage(job: Job<QueueImageDTO>) {
     const { path, imageId } = job.data;
     return this.cloudinary.v2.uploader.upload(
       path,
       {
-        folder: "lofi-res/images"
+        folder: "lofi-res/images",
       },
       async (err, result: CloudinaryResponse) => {
         const payload = await this.imageModel.findByIdAndUpdate(
@@ -64,8 +65,8 @@ export class CloudinaryImageQueueConsumer {
   onActive(job: Job) {
     this.logger.log(
       `Processing job ${job.id} of type ${job.name} with data ${JSON.stringify(
-        job.data,
-      )}`,
+        job.data
+      )}`
     );
   }
 
@@ -74,7 +75,14 @@ export class CloudinaryImageQueueConsumer {
     this.logger.log(
       `Job ${job.id} of type ${
         job.name
-      } has been processed successfully. Result: ${JSON.stringify(result)}`,
+      } has been processed successfully. Result: ${JSON.stringify(result)}`
+    );
+  }
+  
+  @OnQueueFailed()
+  onFailed(job: Job, err: Error) {
+    this.logger.log(
+      `Job ${job.id} of type ${job.name} was failed to process. Error Message: ${err.message}`
     );
   }
 }

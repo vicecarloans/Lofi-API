@@ -7,18 +7,29 @@ import {
   Body,
   Put,
   HttpCode,
-} from '@nestjs/common';
-import { UserService } from './user.service';
-import { BearerAuthGuard } from 'src/auth/bearer-auth.guard';
-import { User } from './user.interface';
-import { UpsertUserDTORequest } from './dto/upsert-user.dto';
-import { ApiOperation, ApiQuery, ApiBearerAuth, ApiOkResponse, ApiCreatedResponse, ApiTags } from '@nestjs/swagger';
-import { UserTracksResponse, UserAlbumsResponse} from './dto/user-response.dto';
-import { UserQueries } from './requests/user-queries';
-import { Upload } from 'src/upload/upload.interface';
-import { Notification } from "src/notification/notification.interface";
-import { NotificationResponse } from 'src/swagger/responses/notification-response.dto';
-import { UploadResponse } from 'src/swagger/responses/upload-response.dto';
+} from "@nestjs/common";
+import { UserService } from "./user.service";
+import { BearerAuthGuard } from "src/auth/bearer-auth.guard";
+import { User } from "./user.serialize";
+import { UpsertUserDTORequest } from "./dto/upsert-user.dto";
+import {
+  ApiOperation,
+  ApiQuery,
+  ApiBearerAuth,
+  ApiOkResponse,
+  ApiCreatedResponse,
+  ApiTags,
+} from "@nestjs/swagger";
+import {
+  UserTracksResponse,
+  UserAlbumsResponse,
+} from "./dto/user-response.dto";
+import { UserQueries } from "./requests/user-queries";
+import { Upload } from "src/upload/upload.serialize";
+import { Notification } from "src/notification/notification.serialize";
+import { NotificationResponse } from "src/swagger/responses/notification-response.dto";
+import { UploadResponse } from "src/swagger/responses/upload-response.dto";
+import { FavouriteCategoriesEnum } from "./enum/favourite-categories";
 
 @ApiTags("User Endpoints")
 @Controller("user")
@@ -88,7 +99,7 @@ export class UserController {
       offset,
       limit
     );
-    return data;
+    return new User(data.toJSON());
   }
 
   @ApiOperation({ summary: "Get My Uploads" })
@@ -169,7 +180,20 @@ export class UserController {
     const {
       user: { claims },
     } = req;
-    console.log(upsertUserDTO);
-    return this.userService.updateOrCreateFavourite(upsertUserDTO, claims.uid);
+    if (upsertUserDTO.category === FavouriteCategoriesEnum.CREATE_PROFILE) {
+      return this.userService.createProfile(claims.uid);
+    }
+    if (upsertUserDTO.category === FavouriteCategoriesEnum.TRACK) {
+      return this.userService.updateOrCreateFavouriteTrack(
+        upsertUserDTO.trackId,
+        claims.uid
+      );
+    }
+    if (upsertUserDTO.category === FavouriteCategoriesEnum.ALBUM) {
+      return this.userService.updateOrCreateFavouriteAlbum(
+        upsertUserDTO.albumId,
+        claims.uid
+      );
+    }
   }
 }

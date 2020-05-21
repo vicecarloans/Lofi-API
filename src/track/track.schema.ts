@@ -19,5 +19,30 @@ export const TrackSchema = new mongoose.Schema({
     type: Boolean,
     default: true,
   },
+  author: String,
+  favourites: {
+    type: Number,
+    default: 0
+  },
+  upvotes: {
+    type: Number,
+    default: 0
+  },
+  downvotes: {
+    type: Number,
+    default: 0
+  },
+  popularity: {
+    type: Number,
+    default: 0
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now()
+  },
+  updatedAt: {
+    type: Date,
+    default: Date.now()
+  },
   owner: String,
 });

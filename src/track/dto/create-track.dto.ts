@@ -13,4 +13,6 @@ export class CreateTrackDTO {
   @ApiProperty({required: false, type: "string"})
   @IsOptional()
   path: string;
+  @ApiProperty({required: true, type: "string"})
+  author: string;
 }

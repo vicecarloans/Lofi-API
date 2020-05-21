@@ -1,3 +1,4 @@
+import { VoteModule } from './vote/vote.module';
 import { NotificationModule } from './notification/notification.module';
 import { UploadModule } from './upload/upload.module';
 import { ImageModule } from './image/image.module';
@@ -12,6 +13,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { UserModule } from './user/user.module';
 import { TrackModule } from './track/track.module';
 import { APP_INTERCEPTOR } from '@nestjs/core';
+
 
 
 @Module({
@@ -34,8 +36,14 @@ import { APP_INTERCEPTOR } from '@nestjs/core';
     TrackModule,
     ImageModule,
     NotificationModule,
+    VoteModule,
   ],
   controllers: [AppController],
-  providers: [AppLoggerService, HttpStrategy, AuthService, {provide: APP_INTERCEPTOR, useClass: CacheInterceptor}],
+  providers: [
+    AppLoggerService,
+    HttpStrategy,
+    AuthService,
+    { provide: APP_INTERCEPTOR, useClass: CacheInterceptor },
+  ],
 })
 export class AppModule {}

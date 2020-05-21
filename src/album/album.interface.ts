@@ -1,11 +1,17 @@
 import { Document } from 'mongoose';
-import { Track } from 'src/track/track.interface';
-import { Image } from 'src/image/image.interface';
+import { ITrack } from 'src/track/track.interface';
+import { IImage } from 'src/image/image.interface';
 
-export interface Album extends Document {
+export interface IAlbum extends Document {
   title: string;
   description: string;
-  tracks: Track[];
-  image: Image;
+  tracks: ITrack[];
+  image: IImage;
   public: boolean;
+  favourites: number;
+  upvotes: number;
+  downvotes: number;
+  popularity: number;
+  createdAt: number;
+  updatedAt: number;
 }

@@ -3,17 +3,19 @@ import { AlbumController } from './album.controller';
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { AlbumSchema } from './album.schema';
+import { VoteSchema } from 'src/vote/vote.schema';
 
 @Module({
   imports: [
-    MongooseModule.forFeatureAsync([
+    MongooseModule.forFeature([
       {
         name: 'Album',
-        useFactory: () => {
-          const schema = AlbumSchema;
-          return schema;
-        },
+        schema: AlbumSchema
       },
+      {
+        name: 'Vote',
+        schema: VoteSchema
+      }
     ]),
   ],
   controllers: [AlbumController],
