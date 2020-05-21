@@ -14,7 +14,7 @@ export class BaseDBObject {
   @Exclude()
   @IsOptional()
   // tslint:disable-next-line: variable-name
-  _v?: any;
+  __v?: any;
 
   toJSON() {
     return classToPlain(this);

@@ -5,7 +5,7 @@ import { BearerAuthGuard } from "src/auth/bearer-auth.guard";
 import { VoteParams } from "./requests/vote-params";
 import { Vote } from "./vote.serialize";
 import { VoteResponse } from "src/swagger/responses/vote-response.dto";
-
+import { omit } from 'lodash'
 @ApiTags("Vote Endpoints")
 @Controller("vote")
 export class VoteController {
@@ -26,6 +26,6 @@ export class VoteController {
     } = req;
     const { subjectId } = params;
     const vote = await this.voteService.getVote(claims.uid, subjectId);
-    return new Vote(vote.toJSON());
+    return new Vote(omit(vote.toJSON(), ["subjectId"]));
   }
 }

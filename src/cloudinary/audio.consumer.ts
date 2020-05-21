@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/camelcase */
 import * as uploadLib from 'cloudinary';
-import {} from '@nestjs/bull';
+import { OnQueueFailed } from '@nestjs/bull';
 import { ConfigService } from '@nestjs/config';
 import { CloudinaryResponse } from './cloudinary.interface';
 import { InjectModel } from '@nestjs/mongoose';
@@ -72,6 +72,13 @@ export class CloudinaryAudioQueueConsumer {
   onComplete(job: Job, result) {
     this.logger.log(
       `Job ${job.id} of type ${job.name} has been processed successfully. Result: ${result}`,
+    );
+  }
+
+  @OnQueueFailed()
+  onFailed(job: Job, err: Error) {
+    this.logger.log(
+      `Job ${job.id} of type ${job.name} was failed to process. Error Message: ${err.message}`
     );
   }
 }

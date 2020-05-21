@@ -5,7 +5,7 @@ export class Image extends BaseDBObject {
     path: string;
     owner: string;
     public: boolean;
-    upload: Upload;
+    upload: Partial<Upload>;
 
     constructor(partial: Partial<Image> = {}) {
         super();

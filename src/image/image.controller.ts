@@ -14,7 +14,6 @@ import {
   HttpCode,
 } from '@nestjs/common';
 import { ImageService } from './image.service';
-import { IImage } from './image.interface';
 import { Image } from './image.serialize'
 import { BearerAuthGuard } from 'src/auth/bearer-auth.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -24,7 +23,7 @@ import { ApiOperation, ApiBearerAuth, ApiOkResponse, ApiParam, ApiBadRequestResp
 import { ImageResponse } from 'src/swagger/responses/image-response.dto';
 import { ImageUploadDTO } from './dto/image-upload.dto';
 import { ImageParams } from './requests/image-params';
-
+import { omit } from "lodash";
 
 @ApiTags("Image Endpoints")
 @Controller("image")
@@ -41,7 +40,8 @@ export class ImageController {
   @Get(":id")
   async getPublicImageById(@Param() params: ImageParams): Promise<Image> {
     const { id } = params;
-    return this.imageService.getPublicImageById(id);
+    const image = await this.imageService.getPublicImageById(id);
+    return new Image(image.toJSON());
   }
 
   @ApiOperation({ summary: "Get Private Image By Id" })
@@ -56,7 +56,8 @@ export class ImageController {
   @Get("private/:id")
   async getPrivateImageById(@Param() params: ImageParams): Promise<Image> {
     const { id } = params;
-    return this.imageService.getPrivateImageById(id);
+    const image = await this.imageService.getPrivateImageById(id);
+    return new Image(image.toJSON());
   }
 
   @ApiOperation({ summary: "Create Image" })
@@ -86,7 +87,11 @@ export class ImageController {
       throw new BadRequestException(file, "Image is required");
     }
     createImageDTO.path = file.path;
-    return this.imageService.createImage(createImageDTO, claims.uid);
+    const image = await this.imageService.createImage(
+      createImageDTO,
+      claims.uid
+    );
+    return new Image(omit(image.toJSON(), "upload"));
   }
 
   @ApiOperation({ summary: "Edit Image" })
@@ -124,7 +129,12 @@ export class ImageController {
     const { id } = params;
 
     editImageDTO.path = file.path;
-    return this.imageService.editImage(id, editImageDTO, claims.uid);
+    const image = await this.imageService.editImage(
+      id,
+      editImageDTO,
+      claims.uid
+    );
+    return new Image(image.toJSON())
   }
 
   @ApiOperation({ summary: "Delete image" })

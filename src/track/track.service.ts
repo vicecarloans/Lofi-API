@@ -54,7 +54,7 @@ export class TrackService {
   }
 
   // -- Public Popular Track
-  async getPublicPopularTrack(offset: number, limit: number): Promise<Track[]> {
+  async getPublicPopularTracks(offset: number, limit: number): Promise<Track[]> {
     return await this.trackModel
       .find({ public: true })
       .populate("image", "-__v -upload")
@@ -65,7 +65,10 @@ export class TrackService {
   }
 
   // -- Private Popular Track
-  async getPrivatePopularTrack(offset: number, limit: number): Promise<Track[]> {
+  async getPrivatePopularTracks(
+    offset: number,
+    limit: number
+  ): Promise<Track[]> {
     return await this.trackModel
       .find({ public: false })
       .populate("image", "-__v -upload")
@@ -111,6 +114,7 @@ export class TrackService {
       },
       {
         jobId: upload._id,
+        attempts: 10,
       }
     );
     return track;
@@ -130,7 +134,7 @@ export class TrackService {
         "Update payload should include at least one updatable field"
       );
     }
-    
+
     const res = await this.trackModel.findOneAndUpdate(
       { _id: trackId, owner },
       { $set: fields, updatedAt: Date.now() },
@@ -149,8 +153,73 @@ export class TrackService {
     }
   }
 
-  // - Upvote Track
+  // -- Private: Toggle Vote from UPVOTE to DOWNVOTE or vice versa
+  async _toggleVoteTrack(trackId: string, action: VoteTypeEnum) {
+    const track = await this.trackModel.findById(trackId);
 
+    if (action === VoteTypeEnum.UPVOTE) {
+      const score = popularityCalc(track.upvotes + 1, track.downvotes - 1);
+      await track.updateOne({
+        $inc: { upvotes: 1, downvotes: -1 },
+        $set: { popularity: score },
+        updatedAt: Date.now(),
+      });
+    }
+
+    if (action === VoteTypeEnum.DOWNVOTE) {
+      const score = popularityCalc(track.upvotes - 1, track.downvotes + 1);
+      await track.updateOne({
+        $inc: { upvotes: -1, downvotes: 1 },
+        $set: { popularity: score },
+        updatedAt: Date.now(),
+      });
+    }
+  }
+
+  // -- Private: Calculate and Add Vote
+  async _addVoteTrack(trackId: string, action: VoteTypeEnum) {
+    const track = await this.trackModel.findById(trackId);
+    if(action === VoteTypeEnum.UPVOTE){
+      const score = popularityCalc(track.upvotes + 1, track.downvotes);
+      await track.updateOne({
+        $inc: { upvotes: 1 },
+        $set: { popularity: score },
+        updatedAt: Date.now(),
+      });
+    }
+
+    if(action === VoteTypeEnum.DOWNVOTE){
+      const score = popularityCalc(track.upvotes, track.downvotes + 1);
+      await track.updateOne({
+        $inc: { downvotes: 1 },
+        $set: { popularity: score },
+        updatedAt: Date.now(),
+      });
+    }
+  }
+
+  // -- Private: Recall Previously Done Vote
+  async _recallVoteTrack(trackId: string, action: VoteTypeEnum) {
+     const track = await this.trackModel.findById(trackId);
+     if(action === VoteTypeEnum.UPVOTE) {
+      const score = popularityCalc(track.upvotes - 1, track.downvotes);
+      await track.updateOne({
+        $inc: { upvotes: -1 },
+        $set: { popularity: score },
+        updatedAt: Date.now(),
+      });
+     }
+
+     if(action === VoteTypeEnum.DOWNVOTE) {
+      const score = popularityCalc(track.upvotes, track.downvotes - 1);
+      await track.updateOne({
+        $inc: { downvotes: -1 },
+        $set: { popularity: score },
+        updatedAt: Date.now(),
+      });
+     }
+  }
+  // - Upvote Track
   async upvoteTrack(trackId: string, owner: string) {
     let shouldVote = true;
     // Find Vote Record
@@ -174,37 +243,16 @@ export class TrackService {
         },
         { upsert: true, rawResult: true }
       );
-      const track = await this.trackModel.findById(trackId);
       if (result.lastErrorObject.updatedExisting) {
         // If vote action was update
-
-        const score = popularityCalc(track.upvotes + 1, track.downvotes - 1);
-        await track.updateOne({
-          $inc: { upvotes: 1, downvotes: -1 },
-          $set: { popularity: score },
-          updatedAt: Date.now(),
-        });
+        await this._toggleVoteTrack(trackId, VoteTypeEnum.UPVOTE)
       } else {
-        // If vote action was insert
-
-        const score = popularityCalc(track.upvotes + 1, track.downvotes);
-        await track.updateOne({
-          $inc: { upvotes: 1 },
-          $set: { popularity: score },
-          updatedAt: Date.now()
-        });
+        await this._addVoteTrack(trackId, VoteTypeEnum.UPVOTE)
       }
     } else {
       // Action is Unvote
       await vote.remove();
-
-      const track = await this.trackModel.findById(trackId);
-      const score = popularityCalc(track.upvotes - 1, track.downvotes);
-      await track.updateOne({
-        $inc: { upvotes: -1 },
-        $set: { popularity: score },
-        updatedAt: Date.now(),
-      });
+      await this._recallVoteTrack(trackId, VoteTypeEnum.UPVOTE);
     }
   }
 
@@ -232,37 +280,18 @@ export class TrackService {
         },
         { upsert: true, rawResult: true }
       );
-      const track = await this.trackModel.findById(trackId);
       if (result.lastErrorObject.updatedExisting) {
         // If vote action was update
-
-        const score = popularityCalc(track.upvotes - 1, track.downvotes + 1);
-        await track.updateOne({
-          $inc: { upvotes: -1, downvotes: 1 },
-          $set: { popularity: score },
-          updatedAt: Date.now(),
-        });
+        await this._toggleVoteTrack(trackId, VoteTypeEnum.DOWNVOTE);
       } else {
         // If vote action was insert
-
-        const score = popularityCalc(track.upvotes, track.downvotes + 1);
-        await track.updateOne({
-          $inc: { downvotes: 1 },
-          $set: { popularity: score },
-          updatedAt: Date.now(),
-        });
+        await this._addVoteTrack(trackId, VoteTypeEnum.DOWNVOTE);
       }
     } else {
       // Action is Unvote
       await vote.remove();
 
-      const track = await this.trackModel.findById(trackId);
-      const score = popularityCalc(track.upvotes, track.downvotes - 1);
-      await track.updateOne({
-        $inc: { downvotes: -1 },
-        $set: { popularity: score },
-        updatedAt: Date.now(),
-      });
+      await this._recallVoteTrack(trackId, VoteTypeEnum.DOWNVOTE);
     }
   }
 

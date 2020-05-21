@@ -7,4 +7,5 @@ export class CreateAlbumDTO {
   tracks: string[];
   @IsMongoId()
   image: string;
+  author: string;
 }

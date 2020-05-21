@@ -51,7 +51,7 @@ export class ImageService {
     await this.imageQueue.add(
       "upload",
       { path: createImageDTO.path, imageId: image._id },
-      { jobId: upload._id }
+      { jobId: upload._id, attempts: 10 }
     );
     return image;
   }

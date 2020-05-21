@@ -42,7 +42,7 @@ import { TrackUploadRequest } from "src/swagger/requests/track-upload";
 import { Track } from "./track.serialize";
 import { TrackVotingDTO } from "./dto/track-vote.dto";
 import { VoteTypeEnum } from "src/vote/vote.enum";
-
+import { omit } from "lodash";
 @ApiTags("Track Endpoints")
 @Controller("track")
 export class TrackController {
@@ -116,7 +116,7 @@ export class TrackController {
     @Query() queryParams: TrackQueries
   ): Promise<Track[]> {
     const { offset = 0, limit = 25 } = queryParams;
-    const tracks = await this.trackService.getPublicPopularTrack(offset, limit);
+    const tracks = await this.trackService.getPublicPopularTracks(offset, limit);
     return tracks.map((track) => new Track(track.toJSON()));
   }
 
@@ -134,13 +134,15 @@ export class TrackController {
     type: Number,
     example: 0,
   })
+  @ApiBearerAuth()
   @ApiOkResponse({ description: "Query Success", type: [TrackResponse] })
+  @UseGuards(BearerAuthGuard)
   @Get("private/popular")
   async getPrivatePopularTracks(
     @Query() queryParams: TrackQueries
   ): Promise<Track[]> {
     const { offset = 0, limit = 25 } = queryParams;
-    const tracks = await this.trackService.getPrivatePopularTrack(offset, limit);
+    const tracks = await this.trackService.getPrivatePopularTracks(offset, limit);
     return tracks.map((track) => new Track(track.toJSON()));
   }
 
@@ -207,7 +209,7 @@ export class TrackController {
       createTrackDTO,
       claims.uid
     );
-    return new Track(track.toJSON());
+    return new Track(omit(track.toJSON(), ["image","upload"]));
   }
 
   // PATCH
@@ -241,7 +243,7 @@ export class TrackController {
       editTrackDTO,
       claims.uid
     );
-    return new Track(track.toJSON());
+    return new Track(omit(track.toJSON(), ["image", "upload"]));
   }
 
   // PUT
@@ -253,7 +255,7 @@ export class TrackController {
   @ApiParam({ name: "id" })
   @ApiNoContentResponse({ description: "Vote Registered" })
   @UseGuards(BearerAuthGuard)
-  @Put(":id")
+  @Put("vote/:id")
   @HttpCode(204)
   async voteTrack(
     @Request() req,

@@ -7,4 +7,6 @@ export class EditAlbumDTO {
   description: string;
   @IsOptional()
   tracks: string[];
+  @IsOptional()
+  author: string;
 }

@@ -8,4 +8,10 @@ export interface IAlbum extends Document {
   tracks: ITrack[];
   image: IImage;
   public: boolean;
+  favourites: number;
+  upvotes: number;
+  downvotes: number;
+  popularity: number;
+  createdAt: number;
+  updatedAt: number;
 }

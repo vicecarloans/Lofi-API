@@ -11,6 +11,7 @@ import {
   Process,
   OnQueueActive,
   OnQueueCompleted,
+  OnQueueFailed,
 } from '@nestjs/bull';
 import { Job } from 'bull';
 import { QueueImageDTO } from 'src/image/dto/queue-image.dto';
@@ -75,6 +76,13 @@ export class CloudinaryImageQueueConsumer {
       `Job ${job.id} of type ${
         job.name
       } has been processed successfully. Result: ${JSON.stringify(result)}`
+    );
+  }
+  
+  @OnQueueFailed()
+  onFailed(job: Job, err: Error) {
+    this.logger.log(
+      `Job ${job.id} of type ${job.name} was failed to process. Error Message: ${err.message}`
     );
   }
 }
