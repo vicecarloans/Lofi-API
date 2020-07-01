@@ -12,6 +12,6 @@ export class UpsertUserDTORequest {
 
   @ApiProperty({name: "category", type: "string", enum: FavouriteCategoriesEnum})
   @IsEnum(FavouriteCategoriesEnum)
-  @IsDefined()
+  @IsOptional()
   category: FavouriteCategoriesEnum;
 }
