@@ -14,7 +14,7 @@ export class AuthService {
 
   async validateToken(token: string): Promise<any> {
     try {
-      return await this.oktaVerifier.verifyAccessToken(token, 'api://default');
+      return await this.oktaVerifier.verifyAccessToken(token, 'api://lofi');
     } catch (err) {
       console.warn(err);
     }
