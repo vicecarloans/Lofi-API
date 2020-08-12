@@ -8,7 +8,7 @@ export class AlbumQueries {
     offset: number;
 
     @IsInt()
-    @Min(25)
+    @Min(1)
     @Max(100)
     @Type(() => Number)
     limit: number;

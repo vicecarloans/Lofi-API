@@ -15,7 +15,7 @@ async function bootstrap() {
   app.setGlobalPrefix('v1');
   app.useGlobalPipes(new ValidationPipe({skipMissingProperties: true}));
   app.enableCors({
-    origin: ["http://localhost:3000", "https://lofi-web.herokuapp.com"],
+    origin: ["http://localhost:3000", "https://lofi.huydam.guru"],
   });
   app.use(
     rateLimit({
