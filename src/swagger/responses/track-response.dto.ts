@@ -45,3 +45,9 @@ export class TrackResponse {
   downvotes: number;
 }
 
+export class TrackCollectionResponse {
+  @ApiProperty({ name: "items", type: [TrackResponse] })
+  items: TrackResponse[];
+  @ApiProperty({name: "count", type: "number"})
+  count: number;
+}

@@ -35,7 +35,7 @@ import {
   ApiNotFoundResponse,
   ApiNoContentResponse,
 } from "@nestjs/swagger";
-import { TrackResponse } from "../swagger/responses/track-response.dto";
+import { TrackResponse, TrackCollectionResponse } from "../swagger/responses/track-response.dto";
 import { TrackQueries } from "./requests/track-queries";
 import { TrackParams } from "./requests/track-params";
 import { TrackUploadRequest } from "src/swagger/requests/track-upload";
@@ -43,6 +43,9 @@ import { Track } from "./track.serialize";
 import { TrackVotingDTO } from "./dto/track-vote.dto";
 import { VoteTypeEnum } from "src/vote/vote.enum";
 import { omit } from "lodash";
+import { TrackCollection } from "./response/track-many";
+
+
 @ApiTags("Track Endpoints")
 @Controller("track")
 export class TrackController {
@@ -63,13 +66,13 @@ export class TrackController {
     type: Number,
     example: 0,
   })
-  @ApiOkResponse({ description: "Query Success", type: [TrackResponse] })
+  @ApiOkResponse({ description: "Query Success", type: TrackCollectionResponse })
   @Get("")
-  async getPublicTracks(@Query() queryParams: TrackQueries): Promise<Track[]> {
+  async getPublicTracks(@Query() queryParams: TrackQueries): Promise<TrackCollection> {
     const { offset = 0, limit = 25 } = queryParams;
-    const tracks = await this.trackService.getPublicTracks(offset, limit);
+    const {items , count} = await this.trackService.getPublicTracks(offset, limit);
 
-    return tracks.map((track) => new Track(track.toJSON()));
+    return {items: items.map((track) => new Track(track.toJSON())), count}
   }
 
   // -- Private Recently Added Tracks
@@ -87,13 +90,13 @@ export class TrackController {
     type: Number,
     example: 0,
   })
-  @ApiOkResponse({ description: "Query Success", type: [TrackResponse] })
+  @ApiOkResponse({ description: "Query Success", type: TrackCollectionResponse })
   @UseGuards(BearerAuthGuard)
   @Get("private")
-  async getPrivateTracks(@Query() queryParams: TrackQueries): Promise<Track[]> {
+  async getPrivateTracks(@Query() queryParams: TrackQueries): Promise<TrackCollection> {
     const { offset = 0, limit = 25 } = queryParams;
-    const tracks = await this.trackService.getPrivateTracks(offset, limit);
-    return tracks.map((track) => new Track(track.toJSON()));
+    const {items , count} = await this.trackService.getPrivateTracks(offset, limit);
+    return {items: items.map((track) => new Track(track.toJSON())), count}
   }
 
   // -- Public Popular Tracks
@@ -110,14 +113,14 @@ export class TrackController {
     type: Number,
     example: 0,
   })
-  @ApiOkResponse({ description: "Query Success", type: [TrackResponse] })
+  @ApiOkResponse({ description: "Query Success", type: TrackCollectionResponse })
   @Get("popular")
   async getPublicPopularTracks(
     @Query() queryParams: TrackQueries
-  ): Promise<Track[]> {
+  ): Promise<TrackCollection> {
     const { offset = 0, limit = 25 } = queryParams;
-    const tracks = await this.trackService.getPublicPopularTracks(offset, limit);
-    return tracks.map((track) => new Track(track.toJSON()));
+    const {items , count} = await this.trackService.getPublicPopularTracks(offset, limit);
+    return {items: items.map((track) => new Track(track.toJSON())), count}
   }
 
   // -- Private Popular Tracks
@@ -135,15 +138,15 @@ export class TrackController {
     example: 0,
   })
   @ApiBearerAuth()
-  @ApiOkResponse({ description: "Query Success", type: [TrackResponse] })
+  @ApiOkResponse({ description: "Query Success", type: TrackCollectionResponse })
   @UseGuards(BearerAuthGuard)
   @Get("private/popular")
   async getPrivatePopularTracks(
     @Query() queryParams: TrackQueries
-  ): Promise<Track[]> {
+  ): Promise<TrackCollection> {
     const { offset = 0, limit = 25 } = queryParams;
-    const tracks = await this.trackService.getPrivatePopularTracks(offset, limit);
-    return tracks.map((track) => new Track(track.toJSON()));
+    const {items , count} = await this.trackService.getPrivatePopularTracks(offset, limit);
+    return {items: items.map((track) => new Track(track.toJSON())), count}
   }
 
   // -- Public Track By Id

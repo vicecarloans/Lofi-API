@@ -24,3 +24,10 @@ export class AlbumResponse {
   @ApiProperty({ name: "downvotes", type: "number" })
   downvotes: number;
 }
+
+export class AlbumCollectionResponse {
+  @ApiProperty({ name: "items", type: [AlbumResponse] })
+  items: AlbumResponse[];
+  @ApiProperty({ name: "count", type: "number" })
+  count: number;
+}

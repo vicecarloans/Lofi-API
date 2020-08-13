@@ -35,6 +35,8 @@ import { AlbumResponse } from "src/swagger/responses/album-response.dto";
 import { omit } from "lodash";
 import { AlbumVotingDTO } from "./dto/album-vote.dto";
 import { VoteTypeEnum } from "src/vote/vote.enum";
+import { AlbumCollection } from "./response/album-many";
+
 
 @ApiTags("Album Endpoints")
 @Controller("album")
@@ -58,11 +60,11 @@ export class AlbumController {
   })
   @ApiOkResponse({ description: "Query Success", type: [AlbumResponse] })
   @Get("")
-  async getPublicAlbums(@Query() queryParams: AlbumQueries): Promise<Album[]> {
+  async getPublicAlbums(@Query() queryParams: AlbumQueries): Promise<AlbumCollection> {
     const { offset = 0, limit = 25 } = queryParams;
-    const albums = await this.albumService.getPublicAlbums(offset, limit);
+    const {items, count} = await this.albumService.getPublicAlbums(offset, limit);
 
-    return albums.map((album) => new Album(album.toJSON()));
+    return {items: items.map((album) => new Album(album.toJSON())), count};
   }
 
   // -- Get Private Recently Added Albums
@@ -83,10 +85,10 @@ export class AlbumController {
   @ApiOkResponse({ description: "Query Success", type: [AlbumResponse] })
   @UseGuards(BearerAuthGuard)
   @Get("private")
-  async getPrivateAlbums(@Query() queryParams: AlbumQueries): Promise<Album[]> {
+  async getPrivateAlbums(@Query() queryParams: AlbumQueries): Promise<AlbumCollection> {
     const { offset = 0, limit = 25 } = queryParams;
-    const albums = await this.albumService.getPrivateAlbums(offset, limit);
-    return albums.map((album) => new Album(album.toJSON()));
+    const {items, count} = await this.albumService.getPrivateAlbums(offset, limit);
+    return {items: items.map((album) => new Album(album.toJSON())), count}
   }
 
   // -- Get Public Popular Albums
@@ -107,13 +109,13 @@ export class AlbumController {
   @Get("popular")
   async getPublicPopularAlbums(
     @Query() queryParams: AlbumQueries
-  ): Promise<Album[]> {
+  ): Promise<AlbumCollection> {
     const { offset = 0, limit = 25 } = queryParams;
-    const albums = await this.albumService.getPublicPopularAlbums(
+    const {items, count} = await this.albumService.getPublicPopularAlbums(
       offset,
       limit
     );
-    return albums.map((album) => new Album(album.toJSON()));
+    return {items: items.map((album) => new Album(album.toJSON())), count}
   }
 
   // -- Get Private Popular Albums
@@ -136,13 +138,13 @@ export class AlbumController {
   @Get("private/popular")
   async getPrivatePopularAlbums(
     @Query() queryParams: AlbumQueries
-  ): Promise<Album[]> {
+  ): Promise<AlbumCollection> {
     const { offset = 0, limit = 25 } = queryParams;
-    const albums = await this.albumService.getPrivatePopularAlbums(
+    const {items, count} = await this.albumService.getPrivatePopularAlbums(
       offset,
       limit
     );
-    return albums.map((album) => new Album(album.toJSON()));
+    return {items: items.map((album) => new Album(album.toJSON())), count}
   }
 
   // -- Get Public Album By Id
