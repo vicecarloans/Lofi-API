@@ -1,0 +1,18 @@
+runtime: nodejs12 # or nodejs10
+
+instance_class: F2
+
+env_variables:
+    CLIENT_ID: "0oa92x0l8UYV3W4JY4x6"
+    CLOUDINARY_API_KEY: "421223359525716"
+    CLOUDINARY_NAME: "stackoverflow"
+    CLOUDINARY_SECRET: "zQU8JDzMLb4nMST-epFTPSQX8no"
+    ISSUER: "https://auth.huydam.guru/oauth2/lofi"
+    MONGO_URL: "mongodb+srv://root:CXJdcN9MurcrTMH1@lofi-db.hpejd.mongodb.net/lofi-db?retryWrites=true&w=majority"
+    NODE_ENV: "PRODUCTION"
+    NPM_CONFIG_PRODUCTION: "false"
+    REDIS_HOST: "pike.redistogo.com"
+    REDIS_PASSWORD: "b9e83c272a3aa49ff4119f87b3700b2e"
+    REDIS_PORT: "10956"
+    REDISTOGO_URL: "redis://redistogo:b9e83c272a3aa49ff4119f87b3700b2e@pike.redistogo.com:10956"
+    SESSION_REDIS_URL: "redis://redistogo:ca692533872f8abc6719cefaf5113d32@pike.redistogo.com:10328"
