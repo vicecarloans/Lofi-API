@@ -36,7 +36,7 @@
     "@nestjs/platform-express": "^7.0.8",
     "@nestjs/swagger": "^4.5.3",
     "@okta/jwt-verifier": "^1.0.0",
-    "async": "^3.2.0",
+    "async": "^3.2.2",
     "bull": "^3.13.0",
     "cache-manager": "^3.3.0",
     "class-transformer": "^0.3.1",
